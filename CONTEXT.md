@@ -1,10 +1,10 @@
 # CONTEXT.md — StreamKit
 
-**Version:** 0.1.0
+**Version:** 0.1.1
 **Status:** Active
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-16
-**Last Updated:** 2026-06-16
+**Last Updated:** 2026-06-20
 
 ---
 
@@ -111,8 +111,8 @@ streamkit/
 
 | Content Type | Source | Notes |
 |---|---|---|
-| VOD Catalog | Mux API | Dynamic catalog; free tier assumed sufficient for Phase 1 |
-| Live Stream | NASA TV (HLS) | Stable public stream, no auth required |
+| VOD Catalog | Mux API | Dynamic catalog; free tier assumed sufficient for Phase 1; no test assets selected yet |
+| Live Stream | Red Bull TV ("Best of Red Bull", HLS) | Replaces NASA TV (discontinued 2024). **⚠️ Candidate URL unverified** — see Open Questions #5 |
 | Custom VOD (Phase 4+) | Local backend | Packaged via FFmpeg + Shaka Packager |
 | DRM Test Streams (Phase 5) | Shaka or Axinom test server | Widevine L3 test credentials |
 
@@ -134,10 +134,13 @@ Persisted in DataStore. Injected at the `NetworkModule` level.
 | Document | Status | Notes |
 |---|---|---|
 | `PRODUCT.md` | ✅ Complete | v0.1.0 |
-| `SPEC.md` | ✅ Complete | v0.1.1 — BR-PLY-06 added (progress bar seeking) |
+| `SPEC.md` | ✅ Complete | v0.1.3 — BR-PLY-06 added; NASA TV replaced with Red Bull TV (unverified, see Open Questions) |
 | `ARCHITECTURE.md` | ✅ Complete | v0.1.0 |
 | `ROADMAP.md` | ✅ Complete | v0.1.0 |
-| `CONTEXT.md` | ✅ Complete | v0.1.0 |
+| `CONTEXT.md` | ✅ Complete | v0.1.1 |
+| `specs/technical/data-model.md` | ✅ Complete | v0.1.3 — full Room + PostgreSQL schema; cross-device resume resolved (video-scoped); Red Bull TV stream URL flagged unverified |
+| `specs/technical/api-contract.md` | ✅ Complete | v0.1.0 — covers Phase 4 (ingestion), Phase 5 (DRM), Phase 6 (telemetry); no auth/tenancy, no sync API (not applicable to StreamKit) |
+| `specs/technical/content-catalog.md` | ✅ Complete | v0.1.0 — Mux documented generically (no assets selected yet); Red Bull TV carries forward unverified status from data-model.md |
 
 ---
 
@@ -145,10 +148,7 @@ Persisted in DataStore. Injected at the `NetworkModule` level.
 
 | Document | Status | Notes |
 |---|---|---|
-| `specs/technical/data-model.md` | 🔜 Next | Full Room + PostgreSQL schema |
-| `specs/technical/api-contract.md` | Not Started | Backend API endpoint definitions |
-| `specs/technical/streaming-glossary.md` | Not Started | Extended streaming domain reference |
-| `specs/technical/content-catalog.md` | Not Started | Test stream sources and metadata |
+| `specs/technical/streaming-glossary.md` | 🔜 Next | Extended streaming domain reference |
 | `specs/design/design.md` | Not Started | UI guidelines for mobile and TV |
 | `specs/design/navigation.md` | Not Started | App navigation flows |
 | `specs/features/catalog/` | Not Started | requirements.md, design.md, tasks.md |
@@ -170,34 +170,37 @@ Persisted in DataStore. Injected at the `NetworkModule` level.
 | 1 | Mux free tier limits — confirm upload and delivery quotas sufficient for Phase 1 | Open |
 | 2 | Offline playback — should Phase 5 include ExoPlayer DownloadManager for offline DRM content? | Open |
 | 3 | Telemetry dashboard — simple FastAPI-served HTML vs Grafana for Phase 6 QoE visualization | Open |
-| 4 | Cross-device resume — should Phase 6 persist playback position to backend (phone → Fire TV)? | Open |
+| 4 | ~~Cross-device resume — should Phase 6 persist playback position to backend (phone → Fire TV)?~~ | **Resolved** — yes, Phase 6 persists position to backend; resume is video-scoped (not device-scoped), enabling phone ↔ TV resume. See `data-model.md` `PlaybackSession` notes |
+| 5 | **Red Bull TV live stream URL — does it actually play?** Manual playback testing of the candidate URL (`rbmn-live.akamaized.net/.../master.m3u8`) produced no video, despite a valid HLS content type and structure. Suspected cause: geo-restriction. | **Open — blocking Phase 1 live-source implementation.** See `data-model.md` Open Schema Question #4 and `content-catalog.md` for full detail and fallback options |
+| 6 | Local network exposure for Fire TV hardware testing — `api-contract.md` notes the backend is `localhost`-only, but Fire TV is a separate physical device needing LAN access in Phase 5/6 | Open — needs a decision before Phase 5 hardware testing |
 
 ---
 
 ## Data Model Summary (High Level)
 
-Defined in `SPEC.md`. Full schema to be drafted in `specs/technical/data-model.md`.
+Full schema is defined in `specs/technical/data-model.md` (complete as of v0.1.3). This table is retained here only as a quick-reference index — `data-model.md` is authoritative for field-level detail.
 
 | Entity | Platform | Phase |
 |---|---|---|
-| `Video` | Android (Room) + Backend (PostgreSQL) | 1 |
-| `PlaybackSession` | Android (Room) + Backend (PostgreSQL) | 1 |
-| `VideoRendition` | Backend (PostgreSQL) | 4 |
-| `IngestJob` | Backend (PostgreSQL) | 4 |
+| `Video` | Android (Room) + Backend (PostgreSQL) | 1 (Android) / 4 (Backend) |
+| `PlaybackSession` | Android (Room, position-only) + Backend (PostgreSQL, full session) | 1 (Android) / 6 (Backend) |
+| `VideoRendition` | Backend (PostgreSQL) only | 4 |
+| `IngestJob` | Backend (PostgreSQL) only | 4 |
 | `TelemetryEvent` | Android (Room buffer) + Backend (PostgreSQL) | 6 |
 
 ---
 
 ## Next Step
 
-**Draft `specs/technical/data-model.md`**
+**Draft `specs/technical/streaming-glossary.md`**
 
-Define the full schema for all entities across both Android (Room) and Backend (PostgreSQL):
-- `Video` — catalog entry, VOD and live
-- `PlaybackSession` — per-session playback state and position tracking
-- `VideoRendition` — ABR renditions produced by the ingestion pipeline
-- `IngestJob` — ingestion pipeline job state machine
-- `TelemetryEvent` — player QoE events buffered locally and flushed to backend
+The remaining technical spec document. Extends `SPEC.md`'s existing glossary with deeper streaming-domain reference material — likely covering ABR algorithm behavior, manifest structure detail (HLS tags, DASH periods/adaptation sets), codec/container specifics, and DRM concepts beyond what `SPEC.md`'s top-level glossary needs for business-rule context.
+
+**Before moving past the technical specs into feature specs, two blocking items need resolution:**
+1. **Red Bull TV stream verification** (Open Question #5) — manually confirm the candidate live stream URL actually plays before any Android implementation depends on it. See `data-model.md` Open Schema Question #4 and `content-catalog.md` for full detail.
+2. **Mux test asset selection** (Open Question, `content-catalog.md`) — pick and upload actual VOD test content; `content-catalog.md`'s Mux section is currently generic/placeholder.
+
+Neither blocks drafting `streaming-glossary.md` itself, but both should be resolved before Phase 1 implementation begins.
 
 Start a new chat session and reference this file (`CONTEXT.md`) plus `SPEC.md` and `ARCHITECTURE.md` for full context.
 
@@ -208,3 +211,4 @@ Start a new chat session and reference this file (`CONTEXT.md`) plus `SPEC.md` a
 | Version | Date | Author | Notes |
 |---|---|---|---|
 | 0.1.0 | 2026-06-16 | Danielle Mariani | Initial draft — root specs complete, data-model next |
+| 0.1.1 | 2026-06-20 | Danielle Mariani | data-model.md, api-contract.md, and content-catalog.md completed and moved to Completed Spec Documents; NASA TV replaced with Red Bull TV throughout (flagged unverified); cross-device resume open question resolved; added open questions on Red Bull TV verification and Fire TV LAN exposure; Next Step updated to streaming-glossary.md |
