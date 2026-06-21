@@ -1,6 +1,6 @@
 # CONTEXT.md — StreamKit
 
-**Version:** 0.1.1
+**Version:** 0.1.2
 **Status:** Active
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-16
@@ -50,7 +50,6 @@ streamkit/
 │   └── technical/
 │       ├── data-model.md
 │       ├── api-contract.md
-│       ├── streaming-glossary.md
 │       └── content-catalog.md
 ├── PRODUCT.md
 ├── SPEC.md
@@ -148,8 +147,7 @@ Persisted in DataStore. Injected at the `NetworkModule` level.
 
 | Document | Status | Notes |
 |---|---|---|
-| `specs/technical/streaming-glossary.md` | 🔜 Next | Extended streaming domain reference |
-| `specs/design/design.md` | Not Started | UI guidelines for mobile and TV |
+| `specs/design/design.md` | 🔜 Next | UI guidelines for mobile and TV |
 | `specs/design/navigation.md` | Not Started | App navigation flows |
 | `specs/features/catalog/` | Not Started | requirements.md, design.md, tasks.md |
 | `specs/features/media-player/` | Not Started | requirements.md, design.md, tasks.md |
@@ -160,6 +158,8 @@ Persisted in DataStore. Injected at the `NetworkModule` level.
 | `specs/features/ingestion-pipeline/` | Not Started | requirements.md, design.md, tasks.md |
 | `specs/features/drm/` | Not Started | requirements.md, design.md, tasks.md |
 | `specs/features/telemetry/` | Not Started | requirements.md, design.md, tasks.md |
+
+> `specs/technical/streaming-glossary.md` was dropped from scope on 2026-06-20 — `SPEC.md`'s existing glossary (35+ terms) already covers what's needed for business-rule context, and deeper protocol-level detail (HLS tag structure, DASH hierarchy, codec specifics) is better looked up live from primary sources (Apple's HLS spec, ExoPlayer docs) during implementation than pre-written speculatively now.
 
 ---
 
@@ -192,15 +192,17 @@ Full schema is defined in `specs/technical/data-model.md` (complete as of v0.1.3
 
 ## Next Step
 
-**Draft `specs/technical/streaming-glossary.md`**
+**Draft `specs/design/design.md`**
 
-The remaining technical spec document. Extends `SPEC.md`'s existing glossary with deeper streaming-domain reference material — likely covering ABR algorithm behavior, manifest structure detail (HLS tags, DASH periods/adaptation sets), codec/container specifics, and DRM concepts beyond what `SPEC.md`'s top-level glossary needs for business-rule context.
+UI guidelines for both mobile (`app`) and Fire TV (`tv`) modules — covering things like touch vs D-pad interaction patterns, the 10-foot UI conventions referenced in `SPEC.md`'s glossary, typography/spacing baselines, and how the two modules should feel like the same product despite very different input models and viewing distances. Note: per Dani's direction, also renamed from `ui-guidelines.md` to `design.md` for consistency with her other project (Capital, a budget app).
 
-**Before moving past the technical specs into feature specs, two blocking items need resolution:**
+`specs/technical/streaming-glossary.md` has been dropped from scope — `SPEC.md`'s glossary already covers what's needed; see the note in Pending Spec Documents above.
+
+**Before moving past design specs into feature specs, two blocking items still need resolution:**
 1. **Red Bull TV stream verification** (Open Question #5) — manually confirm the candidate live stream URL actually plays before any Android implementation depends on it. See `data-model.md` Open Schema Question #4 and `content-catalog.md` for full detail.
 2. **Mux test asset selection** (Open Question, `content-catalog.md`) — pick and upload actual VOD test content; `content-catalog.md`'s Mux section is currently generic/placeholder.
 
-Neither blocks drafting `streaming-glossary.md` itself, but both should be resolved before Phase 1 implementation begins.
+Neither blocks drafting `design.md` itself, but both should be resolved before Phase 1 implementation begins.
 
 Start a new chat session and reference this file (`CONTEXT.md`) plus `SPEC.md` and `ARCHITECTURE.md` for full context.
 
@@ -212,3 +214,4 @@ Start a new chat session and reference this file (`CONTEXT.md`) plus `SPEC.md` a
 |---|---|---|---|
 | 0.1.0 | 2026-06-16 | Danielle Mariani | Initial draft — root specs complete, data-model next |
 | 0.1.1 | 2026-06-20 | Danielle Mariani | data-model.md, api-contract.md, and content-catalog.md completed and moved to Completed Spec Documents; NASA TV replaced with Red Bull TV throughout (flagged unverified); cross-device resume open question resolved; added open questions on Red Bull TV verification and Fire TV LAN exposure; Next Step updated to streaming-glossary.md |
+| 0.1.2 | 2026-06-20 | Danielle Mariani | Dropped `specs/technical/streaming-glossary.md` from scope — `SPEC.md`'s existing glossary is sufficient; deeper protocol detail is better referenced live during implementation. Removed from repository structure and pending docs. Next Step updated to `specs/design/design.md` |

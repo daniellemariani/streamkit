@@ -218,6 +218,7 @@ StreamKit is a single-user personal application. There is no authentication, no 
 | 0.1.1 | 2026-06-16 | Danielle Mariani | Added BR-PLY-06 — progress bar free seeking |
 | 0.1.2 | 2026-06-20 | Danielle Mariani | Replaced NASA TV with Red Bull TV's 24/7 "Best of Red Bull" stream as the live content source — NASA's 24/7 NTV1-HLS channel was discontinued in 2024 and its public stream URLs no longer resolve |
 | 0.1.3 | 2026-06-20 | Danielle Mariani | Flagged Red Bull TV stream as unverified pending manual playback test — see data-model.md Open Schema Question #4 |
+| 0.1.4 | 2026-06-20 | Danielle Mariani | Removed streaming-glossary.md since it is already defined in SPEC.md |
 
 ---
 
@@ -231,7 +232,6 @@ StreamKit is a single-user personal application. There is no authentication, no 
 | CONTEXT.md | Session continuity and current decisions |
 | specs/technical/data-model.md | Full entity schema |
 | specs/technical/api-contract.md | Backend API endpoint definitions |
-| specs/technical/streaming-glossary.md | Extended streaming domain reference |
 | specs/technical/content-catalog.md | Test stream sources and metadata |
 | specs/design/design.md | UI guidelines for mobile and TV |
 | specs/design/navigation.md | App navigation flows |

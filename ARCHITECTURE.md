@@ -1,10 +1,10 @@
 # ARCHITECTURE.md — StreamKit
 
-**Version:** 0.1.0
+**Version:** 0.1.1
 **Status:** Draft
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-15
-**Last Updated:** 2026-06-15
+**Last Updated:** 2026-06-20
 
 ---
 
@@ -47,7 +47,6 @@ streamkit/
 │   └── technical/
 │       ├── data-model.md
 │       ├── api-contract.md
-│       ├── streaming-glossary.md
 │       └── content-catalog.md
 ├── .cursor/
 │   └── rules/                       # AI coding rules (.mdc files)
@@ -434,6 +433,7 @@ backend/
 | Version | Date | Author | Notes |
 |---|---|---|---|
 | 0.1.0 | 2026-06-15 | Danielle Mariani | Initial draft |
+| 0.1.1 | 2026-06-20 | Danielle Mariani | Removed streaming-glossary.md since it is already defined in SPEC.md |
 
 ---
 
@@ -448,4 +448,3 @@ backend/
 | specs/technical/data-model.md | Full Room and PostgreSQL schema |
 | specs/technical/api-contract.md | Backend API endpoint definitions |
 | specs/technical/content-catalog.md | Test stream sources (Mux, NASA TV) |
-| specs/technical/streaming-glossary.md | Extended streaming domain reference |
