@@ -1,10 +1,10 @@
 # StreamKit
 
-**Version:** 0.1.1
+**Version:** 0.1.3
 **Status:** Draft
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-15
-**Last Updated:** 2026-06-16
+**Last Updated:** 2026-06-20
 
 ## Overview
 
@@ -25,15 +25,16 @@ StreamKit is a personal, single-user streaming reference application built for l
 | **Rendition** | A single quality variant of a video stream (e.g. 1080p at 5Mbps, 720p at 2.5Mbps). A manifest references multiple renditions; the player picks one at a time. |
 | **Segment** | A short chunk of encoded video (typically 2–10 seconds) that the player downloads and plays sequentially. |
 | **VOD** | Video on Demand. Pre-recorded video content available for playback at any time, as opposed to a live stream. |
-| **Live Stream** | A real-time video broadcast delivered as a continuous stream. StreamKit uses NASA TV as its live stream source. |
+| **Live Stream** | A real-time video broadcast delivered as a continuous stream. StreamKit uses Red Bull TV's 24/7 "Best of Red Bull" stream as its live stream source. |
 | **DVR Window** | The buffer of a live stream that can be seeked backwards into. Allows the user to rewind a live broadcast without leaving the live stream. |
 | **Live Button** | A UI control that jumps the playback position back to the current real-time position in a live stream, exiting any DVR seek. |
+| **Red Bull TV** | A publicly accessible, 24/7 HLS live stream ("Best of Red Bull") delivered via Akamai. Used as StreamKit's live stream source. **Unverified as of 2026-06-20** — manual playback testing of the candidate stream URL did not produce video, possibly due to geo-restriction. See `specs/technical/data-model.md` Open Schema Question #4 before relying on this source in Phase 1. |
 | **ExoPlayer / Media3** | Google's open-source Android media playback library. The player engine used in StreamKit's `core` module. |
 | **DRM** | Digital Rights Management. Technology used to protect video content from unauthorized access. StreamKit uses Widevine on Android and Fire TV. |
 | **Widevine** | Google's DRM system, supported on Android and Fire TV. StreamKit targets Widevine L3 using a public test license server. |
 | **License Server** | A backend service that issues DRM license tokens to authenticated players, permitting decryption and playback of protected content. |
 | **Mux** | A video infrastructure platform used in StreamKit as the source for catalog metadata and VOD stream delivery. |
-| **CDN** | Content Delivery Network. A distributed network of servers that delivers video segments to players with low latency. Mux and NASA TV handle CDN delivery in StreamKit. |
+| **CDN** | Content Delivery Network. A distributed network of servers that delivers video segments to players with low latency. Mux and Red Bull TV (via Akamai) handle CDN delivery in StreamKit. |
 | **FFmpeg** | An open-source command-line tool used in StreamKit's backend pipeline to transcode raw video into multiple renditions. |
 | **Shaka Packager** | An open-source tool used to package transcoded video renditions into HLS or DASH format, optionally with DRM encryption. |
 | **Ingestion Pipeline** | The backend process that accepts a raw video upload, transcodes it into multiple renditions via FFmpeg, packages it into HLS, and makes it available for playback. |
@@ -51,7 +52,6 @@ StreamKit is a personal, single-user streaming reference application built for l
 | **App Module** | The `app` Android module containing the mobile UI (touch, portrait, phone/tablet). Depends on `core`. |
 | **TV Module** | The `tv` Android module containing the Fire TV UI (lean-back, D-pad). Depends on `core`. |
 | **SDD** | Spec-Driven Development. The methodology used in StreamKit: specs are written before code, and AI tooling (Cursor, Claude) implements against them. |
-| **NASA TV** | A publicly accessible HLS live stream operated by NASA. Used as StreamKit's live stream source. |
 
 ---
 
@@ -108,7 +108,7 @@ StreamKit is a single-user personal application. There is no authentication, no 
 
 | Entity | Key Fields | Notes |
 |---|---|---|
-| `Video` | id, title, description, type (VOD/LIVE), thumbnail_url, stream_url, duration_seconds, is_drm_protected | Sourced from Mux for VOD; static config for NASA TV live stream |
+| `Video` | id, title, description, type (VOD/LIVE), thumbnail_url, stream_url, duration_seconds, is_drm_protected | Sourced from Mux for VOD; static config for Red Bull TV live stream |
 | `PlaybackSession` | id, video_id, device_type (MOBILE/TV), started_at, ended_at, last_position_seconds | Tracks per-session playback state; foundation for cross-device resume in Phase 6 |
 | `TelemetryEvent` | id, session_id, event_type, timestamp, bitrate_kbps, resolution, buffer_health_seconds, error_code | One row per player event; aggregated for QoE dashboard in Phase 6 |
 | `VideoRendition` | id, video_id, resolution, bitrate_kbps, codec, segment_duration_seconds, manifest_url | Created by the ingestion pipeline in Phase 4; describes each ABR rendition |
@@ -125,7 +125,7 @@ StreamKit is a single-user personal application. There is no authentication, no 
 ### Catalog
 - **BR-CAT-01:** VOD and live content must be visually distinguishable in the catalog (e.g. a LIVE badge on live entries)
 - **BR-CAT-02:** Tapping a catalog item always opens a detail view before playback begins
-- **BR-CAT-03:** Catalog content is sourced from the Mux API; the NASA TV live stream is a static entry always present in the catalog
+- **BR-CAT-03:** Catalog content is sourced from the Mux API; the Red Bull TV live stream is a static entry always present in the catalog
 
 ### Media Player
 - **BR-PLY-01:** Seek forward and seek back controls always move exactly 10 seconds
@@ -206,7 +206,7 @@ StreamKit is a single-user personal application. There is no authentication, no 
 - No social features (watchlists, ratings, comments, sharing)
 - No localization or multi-language support
 - No analytics data collection beyond the developer's own telemetry backend
-- No production CDN setup — Mux handles delivery for VOD; NASA TV for live
+- No production CDN setup — Mux handles delivery for VOD; Red Bull TV (via Akamai) for live
 
 ---
 
@@ -216,6 +216,8 @@ StreamKit is a single-user personal application. There is no authentication, no 
 |---|---|---|---|
 | 0.1.0 | 2026-06-15 | Danielle Mariani | Initial draft |
 | 0.1.1 | 2026-06-16 | Danielle Mariani | Added BR-PLY-06 — progress bar free seeking |
+| 0.1.2 | 2026-06-20 | Danielle Mariani | Replaced NASA TV with Red Bull TV's 24/7 "Best of Red Bull" stream as the live content source — NASA's 24/7 NTV1-HLS channel was discontinued in 2024 and its public stream URLs no longer resolve |
+| 0.1.3 | 2026-06-20 | Danielle Mariani | Flagged Red Bull TV stream as unverified pending manual playback test — see data-model.md Open Schema Question #4 |
 
 ---
 
