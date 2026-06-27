@@ -1,6 +1,6 @@
 # CONTEXT.md — StreamKit
 
-**Version:** 0.1.9
+**Version:** 0.1.10
 **Status:** Active
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-16
@@ -136,11 +136,12 @@ Persisted in DataStore. Injected at the `NetworkModule` level.
 | `SPEC.md` | ✅ Complete | v0.1.6 — applied `navigation.md` decisions: BR-CAT-02 scoped to VOD, BR-LIV-04/05 and BR-PLY-07–11 added, BR-PIP-01 reworded, Settings added to Feature Index. BR-PLY-03 overlay default flipped from off to on. BR-CAT-03 plural rewording still deferred (Open Question #5/#7) |
 | `ARCHITECTURE.md` | ✅ Complete | v0.1.2 — added Screen Orientation subsection (per-destination `requestedOrientation` handling); orientation note from Pending Document Updates is now applied |
 | `ROADMAP.md` | ✅ Complete | v0.1.0 |
-| `CONTEXT.md` | ✅ Complete | v0.1.9 |
+| `CONTEXT.md` | ✅ Complete | v0.1.10 |
 | `specs/technical/data-model.md` | ✅ Complete | v0.1.4 — generalized `Video.id` and related notes to three static live keys (`redbull_tv`, `dw_english`, `nhk_world`); added Open Schema Question #5 for the two new candidates |
 | `specs/technical/api-contract.md` | ✅ Complete | v0.1.0 — covers Phase 4 (ingestion), Phase 5 (DRM), Phase 6 (telemetry); no auth/tenancy, no sync API (not applicable to StreamKit) |
 | `specs/technical/content-catalog.md` | ✅ Complete | v0.1.1 — added Live Source 2 (DW English) and Live Source 3 (NHK World-Japan) as proposed candidates, both unverified and pending Dani's confirmation |
 | `specs/design/navigation.md` | ✅ Complete | v0.1.3 — Catalog, Live Player, Player, and Settings screen flows, route inventory, global nav patterns. Bitrate/resolution/buffer overlay default on; that document's own internal Open Question #1 (live carousel sources) updated to reflect proposed candidates — see this file's Open Questions #5/#7 for the consolidated tracking |
+| `specs/design/design.md` | ✅ Complete | v0.1.0 — dark-only color system (cyan accent, broadcast-red live/error), typography, spacing/shape/elevation tokens, component patterns, motion, lightweight accessibility note, Android/Fire TV platform adaptation |
 
 ---
 
@@ -148,7 +149,6 @@ Persisted in DataStore. Injected at the `NetworkModule` level.
 
 | Document | Status | Notes |
 |---|---|---|
-| `specs/design/design.md` | 🔜 Next | UI guidelines for mobile and TV. Should follow the decisions already locked in `navigation.md` (autoplay vs tap-to-play, maximize/minimize behavior, etc.) |
 | `specs/features/catalog/` | Not Started | requirements.md, design.md, tasks.md |
 | `specs/features/media-player/` | Not Started | requirements.md, design.md, tasks.md |
 | `specs/features/live-player/` | Not Started | requirements.md, design.md, tasks.md |
@@ -231,9 +231,11 @@ Full schema is defined in `specs/technical/data-model.md` (complete as of v0.1.3
 
 ## Next Step
 
-**Awaiting Dani's confirmation on the two proposed live sources** (DW English, NHK World-Japan — Open Question #5/#7) before finalizing `SPEC.md`'s `BR-CAT-03` to plural. That confirmation is the only thing left blocking full closure of the `navigation.md` Live carousel content; it does not block starting `specs/design/design.md`, which can proceed independently using the screen behaviors already locked in `navigation.md`.
+**`specs/design/design.md` is complete (v0.1.0)** — dark-only color system, typography, spacing/shape/elevation tokens, component patterns, and Android/Fire TV platform adaptation, built on the palette approved in chat and the screen behaviors locked in `navigation.md`.
 
-**Separately, regardless of confirmation:** none of the three live URLs (Red Bull TV included) have been manually playback-tested yet. That verification step is still needed before any of them is wired into Android implementation.
+With both design documents (`navigation.md`, `design.md`) complete, the natural next step is starting feature specs under `specs/features/` — `catalog/` is the most foundational, since Media Player and Live Player both build on it. **Still awaiting Dani's confirmation on the two proposed live sources** (DW English, NHK World-Japan — Open Question #5/#7) before `SPEC.md`'s `BR-CAT-03` gets finalized to plural; that doesn't block starting feature specs.
+
+**Separately, regardless of confirmation:** none of the three live URLs (Red Bull TV included) have been manually playback-tested yet.
 
 **Mux test asset selection** (Open Question #1 / `content-catalog.md`) — pick and upload actual VOD test content. Still open, unrelated to the live-source work above.
 
@@ -255,3 +257,4 @@ Start a new chat session and reference this file (`CONTEXT.md`) plus `SPEC.md`, 
 | 0.1.7 | 2026-06-26 | Danielle Mariani | Flipped BR-PLY-03's overlay default from off to on per direction; updated `SPEC.md` (v0.1.6) and `navigation.md` (v0.1.2) to match; confirmed no change needed to `PRODUCT.md`, which already assumed the overlay is shown by default; Open Question #9 resolution text updated accordingly |
 | 0.1.8 | 2026-06-26 | Danielle Mariani | Searched for and proposed two additional live source candidates — DW English and NHK World-Japan — to fill `navigation.md`'s Live carousel; updated `content-catalog.md` (v0.1.1) and `data-model.md` (v0.1.4) accordingly; both candidates are unverified and pending Dani's confirmation, so `SPEC.md`'s `BR-CAT-03` was deliberately left singular rather than flipped to plural; consolidated Open Questions #5 and #7 around this; Next Step updated to reflect the pending confirmation |
 | 0.1.9 | 2026-06-26 | Danielle Mariani | Fixed three stale "Open Question #1" cross-references that should have read #5/#7 after the live-source question renumbering in v0.1.8 — confirmed the underlying SPEC.md and ARCHITECTURE.md work itself was already fully applied (BR-PLY-03 default, the "portrait" wording fix, and the NASA TV reference fix); this was a documentation cross-reference bug, not unfinished work |
+| 0.1.10 | 2026-06-26 | Danielle Mariani | `specs/design/design.md` completed using Dani's uploaded template, adapted for a dark-only theme (cyan accent, broadcast-red live/error, no separate light theme); moved from Pending to Completed Spec Documents; Next Step updated to starting feature specs under `specs/features/`, beginning with `catalog/` |
