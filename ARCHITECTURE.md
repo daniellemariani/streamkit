@@ -1,10 +1,10 @@
 # ARCHITECTURE.md — StreamKit
 
-**Version:** 0.1.1
+**Version:** 0.1.2
 **Status:** Draft
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-15
-**Last Updated:** 2026-06-20
+**Last Updated:** 2026-06-26
 
 ---
 
@@ -12,7 +12,7 @@
 
 StreamKit is a streaming-first application. The primary architectural constraint is that every platform — Android mobile, Fire TV, and backend — is built around real adaptive bitrate streaming protocols (HLS/DASH), real DRM (Widevine), and real telemetry. No mocked playback, no stubbed pipelines.
 
-The Android project is a single Gradle monorepo with three modules: `core` (shared player logic, networking, DRM, telemetry, data models), `app` (mobile UI — Jetpack Compose, touch, portrait), and `tv` (Fire TV UI — Compose for TV, D-pad, lean-back). The backend is a FastAPI + PostgreSQL service responsible for video ingestion, packaging, DRM license proxying, and telemetry collection. Both Android and backend live in the same repository.
+The Android project is a single Gradle monorepo with three modules: `core` (shared player logic, networking, DRM, telemetry, data models), `app` (mobile UI — Jetpack Compose, touch; portrait-only on Catalog and Settings, with landscape support on the player screens — see Screen Orientation below), and `tv` (Fire TV UI — Compose for TV, D-pad, lean-back). The backend is a FastAPI + PostgreSQL service responsible for video ingestion, packaging, DRM license proxying, and telemetry collection. Both Android and backend live in the same repository.
 
 Phase 1 establishes the player foundation on Android. Subsequent phases extend the platform surface (Chromecast, Fire TV) and introduce the backend pipeline (ingestion, DRM, telemetry). No phase should be started before the prior phase spec is complete and its core acceptance criteria are met.
 
@@ -284,6 +284,23 @@ Rules:
 
 ---
 
+### Screen Orientation
+
+Catalog and Settings are portrait-only. Player and Live Player support both portrait and landscape, driven by two equivalent triggers — the in-screen maximize/minimize toggle and the device's physical rotation sensor (`SPEC.md` `BR-PLY-08`, `BR-LIV-05`).
+
+This is **per-destination orientation handling**, not a single Activity-level lock, since the app is single-Activity (`MainActivity` hosts `AppNavGraph`):
+
+- The Activity's `requestedOrientation` is driven by the current destination: `SCREEN_ORIENTATION_PORTRAIT` while on Catalog or Settings, `SCREEN_ORIENTATION_SENSOR` while on Player or Live Player. This is set by observing the current `NavBackStackEntry` from `AppNavGraph`, not hardcoded per-Activity.
+- While `SCREEN_ORIENTATION_SENSOR` is active on a player screen, the OS sensor is free to rotate the display. Compose reads the actual `Configuration.orientation` as the single source of truth for whether the player is "maximized" (landscape) or "minimized" (portrait) — there is no separate in-app boolean tracking this, to avoid the two drifting out of sync.
+- The maximize/minimize toggle button doesn't maintain its own state machine either: it calls `requestedOrientation = SCREEN_ORIENTATION_LANDSCAPE` (or `PORTRAIT`) to force the change, then immediately resets to `SCREEN_ORIENTATION_SENSOR` so a subsequent physical rotation keeps working. The toggle and the sensor are two inputs into the same state, not two competing ones.
+- `tv` has no equivalent — Fire TV has no orientation sensor and is always presented in its lean-back landscape layout.
+
+Rules:
+- Orientation changes never interrupt playback (`BR-PLY-05`)
+- Back press while a player screen is in landscape forces `requestedOrientation = SCREEN_ORIENTATION_PORTRAIT` first, rather than popping the nav back stack; a second back press then navigates back to Catalog as normal (`BR-PLY-11`)
+
+---
+
 ### Dependency Injection
 
 Hilt provides the DI graph. Modules are defined per concern in `core/di/`:
@@ -434,6 +451,7 @@ backend/
 |---|---|---|---|
 | 0.1.0 | 2026-06-15 | Danielle Mariani | Initial draft |
 | 0.1.1 | 2026-06-20 | Danielle Mariani | Removed streaming-glossary.md since it is already defined in SPEC.md |
+| 0.1.2 | 2026-06-26 | Danielle Mariani | Added Screen Orientation subsection per `navigation.md`/`CONTEXT.md` — per-destination `requestedOrientation` handling (portrait-locked Catalog/Settings vs. sensor-driven Player/Live Player), with the maximize toggle and physical rotation treated as two inputs into the same state rather than separate ones; updated the Overview's module description to drop the blanket "portrait" descriptor for `app`; corrected a stale "NASA TV" reference in Related Documents to Red Bull TV |
 
 ---
 
@@ -447,4 +465,4 @@ backend/
 | CONTEXT.md | Session continuity and current decisions |
 | specs/technical/data-model.md | Full Room and PostgreSQL schema |
 | specs/technical/api-contract.md | Backend API endpoint definitions |
-| specs/technical/content-catalog.md | Test stream sources (Mux, NASA TV) |
+| specs/technical/content-catalog.md | Test stream sources (Mux, Red Bull TV) |

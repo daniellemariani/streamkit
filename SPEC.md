@@ -1,10 +1,10 @@
 # StreamKit
 
-**Version:** 0.1.3
+**Version:** 0.1.6
 **Status:** Draft
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-15
-**Last Updated:** 2026-06-20
+**Last Updated:** 2026-06-26
 
 ## Overview
 
@@ -71,6 +71,7 @@ StreamKit is a single-user personal application. There is no authentication, no 
 | Media Player | specs/features/media-player/requirements.md | Play VOD streams with ABR, player controls, and bitrate overlay | Not Started |
 | Live Player | specs/features/live-player/requirements.md | Play live streams with DVR seek and Live button | Not Started |
 | Picture in Picture | specs/features/pip/requirements.md | Shrink player to floating overlay while multitasking | Not Started |
+| Settings | specs/features/settings/requirements.md | Environment picker (Mux/Local) and player diagnostic toggles | Not Started |
 
 ### Phase 2 — Multi-screen / Chromecast (Android)
 
@@ -124,24 +125,31 @@ StreamKit is a single-user personal application. There is no authentication, no 
 
 ### Catalog
 - **BR-CAT-01:** VOD and live content must be visually distinguishable in the catalog (e.g. a LIVE badge on live entries)
-- **BR-CAT-02:** Tapping a catalog item always opens a detail view before playback begins
-- **BR-CAT-03:** Catalog content is sourced from the Mux API; the Red Bull TV live stream is a static entry always present in the catalog
+- **BR-CAT-02:** Tapping a VOD catalog item always opens a detail view before playback begins. Live catalog items are an explicit exception — see `BR-LIV-04` — playback begins automatically with no detail-first step.
+- **BR-CAT-03:** Catalog content is sourced from the Mux API; the Red Bull TV live stream is a static entry always present in the catalog. *(Pending: `navigation.md` calls for a 3-item live carousel — this rule will be reworded to plural once the two additional live sources are confirmed; see `CONTEXT.md` Open Question #1/#7.)*
 
 ### Media Player
 - **BR-PLY-01:** Seek forward and seek back controls always move exactly 10 seconds
 - **BR-PLY-02:** Seeking before the 10-second mark seeks to position 0:00, not a negative timestamp
-- **BR-PLY-03:** A real-time overlay must display current bitrate (kbps), resolution, and buffer health during playback
+- **BR-PLY-03:** The bitrate/resolution/buffer-health overlay is toggleable from Settings (default on). When enabled, it must display current bitrate (kbps), resolution, and buffer health in real time during playback.
 - **BR-PLY-04:** The player must begin bitrate adaptation within 5 seconds of a simulated network degradation
 - **BR-PLY-05:** Playback must resume from the same position after an interruption (e.g. incoming call, PiP exit)
 - **BR-PLY-06:** The player must support free seeking via a progress bar — the user can drag to any position within the playable range of the stream
+- **BR-PLY-07:** Long-pressing the video surface temporarily sets playback speed to 1.5x; releasing the press reverts playback speed to 1x.
+- **BR-PLY-08:** The maximize/minimize toggle and the device's physical rotation sensor both control whether the player is in landscape (fullscreen) or portrait (windowed) mode.
+- **BR-PLY-09:** In landscape (maximized) mode, the video fills the entire screen and the screen is not scrollable.
+- **BR-PLY-10:** In portrait (minimized) mode, the video is pinned to the top of the screen at full width, with metadata scrollable below.
+- **BR-PLY-11:** Pressing back while maximized exits to portrait mode first, remaining on the same screen; a second back press exits the screen to Catalog.
 
 ### Live Player
 - **BR-LIV-01:** The Live button is only visible when the playback position is behind the live edge
 - **BR-LIV-02:** Tapping the Live button always seeks to the current live edge immediately
 - **BR-LIV-03:** DVR seek must not seek beyond the available DVR window boundary
+- **BR-LIV-04:** Live playback begins automatically when the Live Player screen is entered; no user tap-to-play step is required.
+- **BR-LIV-05:** The Live Player screen shares the same maximize/minimize, fullscreen, and back-navigation orientation behavior as the Media Player screen (`BR-PLY-08`–`BR-PLY-11`).
 
 ### Picture in Picture
-- **BR-PIP-01:** PiP activates automatically when the user navigates away from the player screen (auto-enter PiP, Android 12+)
+- **BR-PIP-01:** PiP activates automatically when the user navigates away from the player screen while content is actively playing (auto-enter PiP, Android 12+). Navigating away while paused does not trigger PiP.
 - **BR-PIP-02:** Playback must continue without interruption when entering or exiting PiP
 - **BR-PIP-03:** PiP overlay must include play/pause control at minimum
 
@@ -219,6 +227,8 @@ StreamKit is a single-user personal application. There is no authentication, no 
 | 0.1.2 | 2026-06-20 | Danielle Mariani | Replaced NASA TV with Red Bull TV's 24/7 "Best of Red Bull" stream as the live content source — NASA's 24/7 NTV1-HLS channel was discontinued in 2024 and its public stream URLs no longer resolve |
 | 0.1.3 | 2026-06-20 | Danielle Mariani | Flagged Red Bull TV stream as unverified pending manual playback test — see data-model.md Open Schema Question #4 |
 | 0.1.4 | 2026-06-20 | Danielle Mariani | Removed streaming-glossary.md since it is already defined in SPEC.md |
+| 0.1.5 | 2026-06-26 | Danielle Mariani | Applied `navigation.md` decisions: BR-CAT-02 scoped to VOD (Live is now an explicit autoplay exception via new BR-LIV-04); added BR-LIV-05 (shares Player screen orientation rules); added BR-PLY-07 (long-press 1.5x speed) and BR-PLY-08–BR-PLY-11 (maximize/minimize, fullscreen, back-navigation behavior); reworded BR-PLY-03 — the bitrate/resolution/buffer overlay is now a Settings toggle, default off, rather than always-on; reworded BR-PIP-01 — auto-enter PiP only while actively playing; added Settings to the Phase 1 Feature Index. BR-CAT-03's plural rewording is deferred until the two additional live sources are confirmed (see CONTEXT.md Open Question #1/#7). Also corrected a header/changelog version mismatch (header previously read 0.1.3 while the changelog's last entry was already 0.1.4). |
+| 0.1.6 | 2026-06-26 | Danielle Mariani | Flipped BR-PLY-03's overlay default from off to on, per direction — Dani wants the diagnostics visible by default for this learning project. No change needed to `PRODUCT.md`'s Phase 1 Success Criteria, which already assumed the overlay is shown. |
 
 ---
 

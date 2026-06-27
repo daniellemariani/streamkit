@@ -1,21 +1,21 @@
 # content-catalog.md — StreamKit
 
-**Version:** 0.1.0
+**Version:** 0.1.1
 **Status:** Draft
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-20
-**Last Updated:** 2026-06-20
+**Last Updated:** 2026-06-26
 **Location:** specs/technical/content-catalog.md
 
 ---
 
 ## Overview
 
-This document catalogs the actual content sources StreamKit uses during development and testing: where VOD content comes from, what the live stream source is, and how each maps onto the `Video` entity defined in `specs/technical/data-model.md`.
+This document catalogs the actual content sources StreamKit uses during development and testing: where VOD content comes from, what the live stream sources are, and how each maps onto the `Video` entity defined in `specs/technical/data-model.md`.
 
 This is a **sources** document, not a content strategy document. It does not define what categories of content StreamKit should have (that's a product decision, out of scope for a personal learning project) — it defines where the bytes actually come from, what format they arrive in, and what's been verified to work versus what hasn't.
 
-This document inherits the verification status of its live source directly from `specs/technical/data-model.md`. Where the two documents might drift, `data-model.md`'s Open Schema Questions section is authoritative — this document should be updated to match it, not the other way around.
+This document inherits the verification status of its live sources directly from `specs/technical/data-model.md`. Where the two documents might drift, `data-model.md`'s Open Schema Questions section is authoritative — this document should be updated to match it, not the other way around.
 
 ---
 
@@ -25,8 +25,9 @@ This document inherits the verification status of its live source directly from 
 |---|---|
 | SPEC.md | Glossary definitions for Mux, Red Bull TV, CDN, and related terms |
 | ARCHITECTURE.md | Environment switching (Mux vs Local), NetworkModule design |
-| specs/technical/data-model.md | `Video` entity schema; Open Schema Question #4 (Red Bull TV verification) |
+| specs/technical/data-model.md | `Video` entity schema; Open Schema Questions (live source verification) |
 | specs/technical/api-contract.md | `GET /api/v1/videos` and related ingestion endpoints (Phase 4+) |
+| specs/design/navigation.md | Catalog screen's 3-item Live carousel, which these three sources populate |
 
 ---
 
@@ -35,9 +36,13 @@ This document inherits the verification status of its live source directly from 
 | Type | Source | Phase Available | Status |
 |---|---|---|---|
 | VOD catalog | Mux API | 1 | Generic — no specific test assets selected yet |
-| Live stream | Red Bull TV ("Best of Red Bull") | 1 | **Unverified** — see below |
+| Live stream 1 | Red Bull TV ("Best of Red Bull") | 1 | **Unverified** — see below |
+| Live stream 2 | DW (Deutsche Welle) English | 1 | **Proposed, unverified** — see below |
+| Live stream 3 | NHK World-Japan | 1 | **Proposed, unverified** — see below |
 | Custom VOD | Local backend (ingestion pipeline) | 4 | Not started |
 | DRM test streams | Shaka or Axinom test license server | 5 | Not started |
+
+> Live streams 2 and 3 are newly proposed candidates (added 2026-06-26) to fill `navigation.md`'s 3-item Live carousel. They have not yet been confirmed by Dani — flagging that distinction explicitly since picking specific broadcaster brands is a content decision, not a structural one.
 
 ---
 
@@ -60,7 +65,7 @@ This section documents the **expected shape** of Mux-sourced content, to be fill
 | `id` | Mux Asset ID | e.g. a string like `"a1b2c3d4e5"` — assigned by Mux on upload, not chosen by StreamKit |
 | `title` | Set manually in Mux dashboard, or via passthrough metadata at upload | Mux doesn't enforce a title field on the asset itself — StreamKit will need a convention (see Open Questions) |
 | `description` | Same as `title` — not a native Mux asset field | |
-| `type` | Always `"VOD"` for Mux-sourced content | Mux is not used for StreamKit's live source |
+| `type` | Always `"VOD"` for Mux-sourced content | Mux is not used for StreamKit's live sources |
 | `thumbnail_url` | Mux's auto-generated thumbnail endpoint (`https://image.mux.com/{PLAYBACK_ID}/thumbnail.jpg`) | Requires the asset's Playback ID, not the Asset ID |
 | `stream_url` | Mux's HLS playback URL (`https://stream.mux.com/{PLAYBACK_ID}.m3u8`) | This is what ExoPlayer actually loads |
 | `duration_seconds` | Returned by the Mux Asset API after upload processing completes | Not available until the asset finishes processing |
@@ -80,7 +85,7 @@ Once assets are uploaded, this section should be updated with actual Asset IDs, 
 
 ---
 
-## Live Source — Red Bull TV
+## Live Source 1 — Red Bull TV
 
 ### Why Red Bull TV
 
@@ -118,7 +123,7 @@ If the candidate URL continues to fail playback after direct testing, the next s
 
 1. **Try sibling rendition URLs** seen in aggregator lists for the same channel — `master_1660.m3u8` or `master_3360.m3u8` instead of the bare `master.m3u8`. It's possible the master playlist is blocked while a specific bitrate variant resolves, though this is speculative and unconfirmed.
 2. **Test from a different network** — if geo-restriction is confirmed as the cause, testing from a different country/region (or via VPN, acknowledging this only diagnoses the problem rather than fixing it for normal use) would confirm the hypothesis.
-3. **Re-evaluate the live source entirely** — if Red Bull TV cannot be made to work reliably, the live-source decision should be reopened rather than forcing a fragile workaround. This was explicitly deferred per Dani's direction (a backup/fallback source was considered but intentionally not adopted as a Plan B at this stage) — if Red Bull TV fails, that conversation should be revisited rather than silently defaulting to whatever's convenient.
+3. **Fall back to one of the other two carousel sources** — now that DW English and NHK World-Japan are proposed (see below), a third live slot failing doesn't mean reopening the whole live-source decision the way it would have before; it just means the carousel temporarily runs with two verified sources while a replacement third is sourced.
 
 ### Mapping to `Video` Entity
 
@@ -136,9 +141,101 @@ If the candidate URL continues to fail playback after direct testing, the next s
 
 ---
 
+## Live Source 2 — DW (Deutsche Welle) English
+
+**Proposed 2026-06-26, pending Dani's confirmation.** Added to fill the second of three slots in `navigation.md`'s Live carousel.
+
+### Why DW
+
+DW is Germany's state-funded international broadcaster, comparable in global profile to BBC World News or France 24. Its live HLS streams are served from a first-party Akamai subdomain pattern (`dwamdstream*.akamaized.net`) that has appeared consistently across independently maintained IPTV reference sources over multiple years — the same durability signal (a stable channel path rather than a short-lived session token) that made Red Bull TV's candidate URL attractive in the first place.
+
+### Candidate Stream Details
+
+| Field | Value |
+|---|---|
+| Provider | Deutsche Welle (DW) |
+| Stream name | DW English |
+| Protocol | HLS |
+| Candidate URL | `https://dwamdstream107.akamaized.net/hls/live/2017968/dwstream107/stream05/streamPlaylist.m3u8` |
+| CDN | Akamai (first-party DW subdomain) |
+
+### Verification Status: UNVERIFIED
+
+**Confirmed:**
+- The URL pattern (host `dwamdstream107`, channel ID `2017968`) appears consistently across independently maintained IPTV reference lists spanning multiple recent years, suggesting a durable channel path
+- The domain is a first-party DW subdomain, not a third-party aggregator or reseller CDN
+
+**Not confirmed:**
+- No manual playback test has been performed — this candidate hasn't been tried in VLC, ExoPlayer, or any player
+- Unlike Red Bull TV's original research, no HTTP content-type check or third-party manifest-parsing tool was run against this URL during this research pass — this candidate has had **less verification depth** than Red Bull TV, not equal depth
+
+**This is a blocking item**, same as Red Bull TV — do not wire this into Android implementation until manually verified to play from the actual development network.
+
+### Mapping to `Video` Entity
+
+| `Video` field | Value |
+|---|---|
+| `id` | `"dw_english"` (static key) |
+| `title` | `"DW English"` |
+| `description` | `"24/7 international news and current affairs from Deutsche Welle (Germany)."` |
+| `type` | `"LIVE"` |
+| `thumbnail_url` | Not yet sourced — likely a bundled static asset, same approach as Red Bull TV |
+| `stream_url` | The candidate URL above — **unverified, see warning** |
+| `duration_seconds` | `null` (live stream) |
+| `is_drm_protected` | `false` |
+| `source` | `'STATIC'` |
+
+---
+
+## Live Source 3 — NHK World-Japan
+
+**Proposed 2026-06-26, pending Dani's confirmation.** Added to fill the third of three slots in `navigation.md`'s Live carousel.
+
+### Why NHK World-Japan
+
+NHK World-Japan is the Japan Broadcasting Corporation's international English-language channel. Its live HLS endpoint has lived under an official `nhkworld.jp` family domain for years, though the specific path has migrated at least once — from an older `master.nhkworld.jp` URL to the current `media-tyo.hls.nhkworld.jp` URL. That migration history is worth naming up front: it's a higher churn signal than Red Bull TV's unchanged channel ID or DW's stable subdomain pattern, even though the domain itself is still first-party NHK infrastructure rather than a third-party reseller.
+
+### Candidate Stream Details
+
+| Field | Value |
+|---|---|
+| Provider | NHK (Japan Broadcasting Corporation) |
+| Stream name | NHK World-Japan |
+| Protocol | HLS |
+| Candidate URL | `https://media-tyo.hls.nhkworld.jp/hls/w/live/master.m3u8` |
+| CDN | NHK first-party infrastructure |
+
+### Verification Status: UNVERIFIED
+
+**Confirmed:**
+- This is the most recently reported working URL across IPTV reference sources (as recently as January 2026), explicitly replacing an older `master.nhkworld.jp` path reported as no longer working
+- The domain is a first-party NHK subdomain
+
+**Not confirmed:**
+- No manual playback test, HTTP content-type check, or manifest-parsing tool has been run against this URL
+- Given the prior path migration, there's a real chance this URL has already changed again by the time it's tested — treat this as the least durable of the three candidates
+
+**This is a blocking item**, same as the other two. Of the three, this is the one most worth re-checking for a current URL immediately before testing, rather than assuming the value documented here is still current.
+
+### Mapping to `Video` Entity
+
+| `Video` field | Value |
+|---|---|
+| `id` | `"nhk_world"` (static key) |
+| `title` | `"NHK World-Japan"` |
+| `description` | `"24/7 English-language news and culture coverage from Japan's NHK World."` |
+| `type` | `"LIVE"` |
+| `thumbnail_url` | Not yet sourced — likely a bundled static asset, same approach as Red Bull TV |
+| `stream_url` | The candidate URL above — **unverified, and has changed paths before** |
+| `duration_seconds` | `null` (live stream) |
+| `is_drm_protected` | `false` |
+| `source` | `'STATIC'` |
+
+---
+
 ## Custom VOD — Local Ingestion Pipeline (Phase 4+)
 
-Not yet started. Once the Phase 4 ingestion pipeline is built, this section should document any test source video files used to exercise the FFmpeg/Shaka Packager pipeline — for example, a small set of royalty-free raw video files (mp4 or mov) kept locally for repeated ingestion testing, distinct from the Mux-sourced and Red Bull TV catalog entries.
+Not yet started. Once the Phase 4 ingestion pipeline is built, this section should document any test source video files used to exercise the FFmpeg/Shaka Packager pipeline — for example, a small set of royalty-free raw video files (mp4 or mov) kept locally for repeated ingestion testing, distinct from the Mux-sourced and live catalog entries.
 
 **Placeholder — to be filled in at Phase 4 kickoff:**
 - Source file(s) for ingestion testing — format, resolution, length
@@ -166,6 +263,8 @@ Not yet started. Per `ARCHITECTURE.md` and `PRODUCT.md`, Widevine L3 test creden
 | 3 | Mux free tier quota sufficiency (carried over from `PRODUCT.md`) | Open — unconfirmed until real usage against the free tier is observed |
 | 4 | Thumbnail source for the Red Bull TV catalog entry (Mux has a thumbnail API; Red Bull TV does not) | Open — likely resolved with a bundled static image asset rather than a remote fetch |
 | 5 | Shaka vs Axinom for Phase 5 DRM test license server | Deferred to Phase 5 kickoff, per `ARCHITECTURE.md` |
+| 6 | **DW English and NHK World-Japan stream URL playback verification** (see Live Source 2/3 above) | **Open — blocking, same caveat as #1.** Also pending Dani's confirmation that these are the right two sources to add at all |
+| 7 | Thumbnail source for DW English and NHK World-Japan catalog entries | Open — likely resolved the same way as #4, bundled static images |
 
 ---
 
@@ -174,3 +273,4 @@ Not yet started. Per `ARCHITECTURE.md` and `PRODUCT.md`, Widevine L3 test creden
 | Version | Date | Author | Notes |
 |---|---|---|---|
 | 0.1.0 | 2026-06-20 | Danielle Mariani | Initial draft. Documents Mux as the generic VOD source (no assets selected yet) and Red Bull TV as the live source, replacing the discontinued NASA TV. Carries forward the unverified status of the Red Bull TV stream URL from `data-model.md` v0.1.3 |
+| 0.1.1 | 2026-06-26 | Danielle Mariani | Added Live Source 2 (DW English) and Live Source 3 (NHK World-Japan) as proposed candidates to fill `navigation.md`'s 3-item Live carousel, per Open Question #7 in `CONTEXT.md`. Both flagged unverified with less verification depth than the original Red Bull TV research (no HTTP/manifest check was possible in this pass). Pending Dani's confirmation before treated as final. |
