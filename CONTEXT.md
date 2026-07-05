@@ -1,10 +1,10 @@
 # CONTEXT.md — StreamKit
 
-**Version:** 0.1.10
+**Version:** 0.1.11
 **Status:** Active
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-16
-**Last Updated:** 2026-06-26
+**Last Updated:** 2026-07-04
 
 ---
 
@@ -137,11 +137,14 @@ Persisted in DataStore. Injected at the `NetworkModule` level.
 | `ARCHITECTURE.md` | ✅ Complete | v0.1.2 — added Screen Orientation subsection (per-destination `requestedOrientation` handling); orientation note from Pending Document Updates is now applied |
 | `ROADMAP.md` | ✅ Complete | v0.1.0 |
 | `CONTEXT.md` | ✅ Complete | v0.1.10 |
-| `specs/technical/data-model.md` | ✅ Complete | v0.1.4 — generalized `Video.id` and related notes to three static live keys (`redbull_tv`, `dw_english`, `nhk_world`); added Open Schema Question #5 for the two new candidates |
+| `specs/technical/data-model.md` | ✅ Complete | v0.1.5 — static Live entry `id` changed from human-readable slugs to stable UUIDs (assigned at TSK-CAT-16); names remain in `title` field only. Added BR-CAT-04 as a Mux-mapping rule: only assets with `status == "ready"` are mapped into `VideoEntity` and written to cache |
 | `specs/technical/api-contract.md` | ✅ Complete | v0.1.0 — covers Phase 4 (ingestion), Phase 5 (DRM), Phase 6 (telemetry); no auth/tenancy, no sync API (not applicable to StreamKit) |
 | `specs/technical/content-catalog.md` | ✅ Complete | v0.1.1 — added Live Source 2 (DW English) and Live Source 3 (NHK World-Japan) as proposed candidates, both unverified and pending Dani's confirmation |
 | `specs/design/navigation.md` | ✅ Complete | v0.1.3 — Catalog, Live Player, Player, and Settings screen flows, route inventory, global nav patterns. Bitrate/resolution/buffer overlay default on; that document's own internal Open Question #1 (live carousel sources) updated to reflect proposed candidates — see this file's Open Questions #5/#7 for the consolidated tracking |
-| `specs/design/design.md` | ✅ Complete | v0.1.0 — dark-only color system (cyan accent, broadcast-red live/error), typography, spacing/shape/elevation tokens, component patterns, motion, lightweight accessibility note, Android/Fire TV platform adaptation |
+| `specs/design/design.md` | ✅ Complete | v0.1.1 — Motion Guidelines updated: Live carousel now auto-advances every 8s (cyclic); manual swipe resets the timer; pauses when out of view. Replaces prior "manual swipe only" guidance per decision made during the Catalog feature design session |
+| `specs/features/catalog/requirements.md` | ✅ Complete | v0.2.0 — Mux `List Assets` confirmed as real Phase 1 VOD source; Live carousel specced against real candidate URLs; BR-CAT-04 (`status == "ready"` filter) added as feature-specific rule and promoted to `data-model.md`; top app bar (plain text label + gear icon) added; static live entry IDs specified as UUIDs; VOD empty state simplified to neutral message |
+| `specs/features/catalog/design.md` | ✅ Complete | v0.1.1 — `LazyVerticalGrid` as root layout (nested lazy constraint); MVI with `CatalogUiState`/`CatalogEvent`/`CatalogUiEffect`; 16:9 Live carousel cards, 2:3 VOD poster cards; `LiveCarousel` auto-advance with 8s interval, `settledPage`-keyed `LaunchedEffect`, `isVisible` pause via `LazyGridState`; `VodGrid` implemented as `LazyGridScope` extension |
+| `specs/features/catalog/tasks.md` | ✅ Complete | v0.1.0 — 34 tasks across 10 groups; tasks intentionally single-file scoped for reviewable PRs; Group 0 (Project Foundation) included since Catalog is Phase 1's first feature |
 
 ---
 
@@ -149,7 +152,7 @@ Persisted in DataStore. Injected at the `NetworkModule` level.
 
 | Document | Status | Notes |
 |---|---|---|
-| `specs/features/catalog/` | Not Started | requirements.md, design.md, tasks.md |
+| `specs/features/catalog/` | ✅ Complete | requirements.md (v0.2.0), design.md (v0.1.1), tasks.md (v0.1.0) — see Completed Spec Documents |
 | `specs/features/media-player/` | Not Started | requirements.md, design.md, tasks.md |
 | `specs/features/live-player/` | Not Started | requirements.md, design.md, tasks.md |
 | `specs/features/pip/` | Not Started | requirements.md, design.md, tasks.md |
@@ -193,7 +196,13 @@ These are changes `navigation.md`'s decisions imply for other documents. Tracked
 - **Not yet done:** `SPEC.md`'s `BR-CAT-03` still says singular and is intentionally left untouched — flipping it to plural means treating these two candidates as finalized, which is Dani's call, not mine to make unilaterally. Once confirmed, that's a one-line edit.
 - **Still open regardless of confirmation:** none of the three live URLs (including the original Red Bull TV one) have actually been manually playback-tested yet.
 
-### `api-contract.md`
+### `specs/design/design.md` Motion Guidelines — ✅ Applied 2026-07-04 (v0.1.1)
+
+- ~~"Manual swipe only on the Live carousel — no auto-advancing pager"~~ — updated to reflect the 8s auto-advance decision made during the Catalog feature design session: cyclic advance, manual swipe resets timer, pauses when carousel is out of view.
+
+### Catalog session — pending implementation actions
+
+- **Static live entry UUIDs** — three stable UUIDs must be assigned and hardcoded at TSK-CAT-16 (`LiveSeedConfig.kt`). Once assigned, record all three here in `CONTEXT.md` so they are never accidentally changed. _(Pending implementation)_
 
 - No changes needed for Phase 1 — the new Settings diagnostics (bytes downloaded, network type, dropped frames) are local ExoPlayer/Media3 analytics with no backend dependency yet. Worth revisiting at Phase 6 kickoff if any get promoted into `TelemetryEventType`.
 
@@ -212,6 +221,8 @@ These are changes `navigation.md`'s decisions imply for other documents. Tracked
 | 7 | ~~Two additional live stream URLs needed~~ | **Candidates proposed** — DW English and NHK World-Japan (see Question #5 above for verification status). Need Dani's sign-off on these two specific brands before they're locked in; not a structural blocker on `navigation.md` itself |
 | 8 | ~~Confirm back-button behavior while a player screen is maximized (landscape)~~ | **Resolved** — back exits fullscreen to portrait first, staying on the same screen; second back exits to Catalog. Matches video streaming app convention (YouTube, Netflix, Hulu) |
 | 9 | ~~Should the bitrate/resolution/buffer health overlay (Settings toggle) default to on or off?~~ | **Resolved** — default on |
+| 10 | **Mux `List Assets` secret-in-client** — `GET /video/v1/assets` requires Basic Auth with a Token ID/Secret pair that Mux's docs describe as intended for trusted-server use. Embedding the secret in the Android APK is an accepted risk for this non-distributed project (stored via `local.properties`/`BuildConfig`, never committed), but it's worth an explicit decision: accept as-is for Phase 1, or revisit when the backend exists in Phase 4 and proxy Mux calls through it instead? See `catalog/requirements.md` DS-CAT-05 and TSK-CAT-07 | Open — architecture-level call, not a blocker for Phase 1 |
+| 11 | **Mux asset `title`/`description` naming convention** — Mux has no native title/description field. Until resolved, `Video.title` falls back to the Mux asset `id` as a placeholder. Decide how to name assets at upload time so titles are human-readable in the catalog. See `content-catalog.md` Open Question #2 | Open — must be resolved before Mux test assets are uploaded |
 
 ---
 
@@ -231,15 +242,17 @@ Full schema is defined in `specs/technical/data-model.md` (complete as of v0.1.3
 
 ## Next Step
 
-**`specs/design/design.md` is complete (v0.1.0)** — dark-only color system, typography, spacing/shape/elevation tokens, component patterns, and Android/Fire TV platform adaptation, built on the palette approved in chat and the screen behaviors locked in `navigation.md`.
+**Catalog feature specs are complete** (`requirements.md` v0.2.0, `design.md` v0.1.1, `tasks.md` v0.1.0).
 
-With both design documents (`navigation.md`, `design.md`) complete, the natural next step is starting feature specs under `specs/features/` — `catalog/` is the most foundational, since Media Player and Live Player both build on it. **Still awaiting Dani's confirmation on the two proposed live sources** (DW English, NHK World-Japan — Open Question #5/#7) before `SPEC.md`'s `BR-CAT-03` gets finalized to plural; that doesn't block starting feature specs.
+The natural next feature spec is **`specs/features/media-player/`** — Player is entered exclusively from the Catalog VOD grid and is the core Phase 1 deliverable alongside Catalog.
 
-**Separately, regardless of confirmation:** none of the three live URLs (Red Bull TV included) have been manually playback-tested yet.
+**Before or alongside starting media-player specs, resolve:**
+- Open Question #11 (Mux asset naming convention) — must be decided before uploading test assets, which are needed to exercise the Catalog + Player flow end-to-end.
+- Open Question #5 (live stream URL verification) — still blocking the Live carousel and Live Player; not a blocker for media-player specs themselves.
 
-**Mux test asset selection** (Open Question #1 / `content-catalog.md`) — pick and upload actual VOD test content. Still open, unrelated to the live-source work above.
+**At implementation time (TSK-CAT-16):** assign and record the 3 static live entry UUIDs here in `CONTEXT.md`.
 
-Start a new chat session and reference this file (`CONTEXT.md`) plus `SPEC.md`, `ARCHITECTURE.md`, and `navigation.md` for full context.
+Start a new chat session and reference this file (`CONTEXT.md`) plus `SPEC.md`, `ARCHITECTURE.md`, and the completed catalog specs for full context.
 
 ---
 
@@ -258,3 +271,4 @@ Start a new chat session and reference this file (`CONTEXT.md`) plus `SPEC.md`, 
 | 0.1.8 | 2026-06-26 | Danielle Mariani | Searched for and proposed two additional live source candidates — DW English and NHK World-Japan — to fill `navigation.md`'s Live carousel; updated `content-catalog.md` (v0.1.1) and `data-model.md` (v0.1.4) accordingly; both candidates are unverified and pending Dani's confirmation, so `SPEC.md`'s `BR-CAT-03` was deliberately left singular rather than flipped to plural; consolidated Open Questions #5 and #7 around this; Next Step updated to reflect the pending confirmation |
 | 0.1.9 | 2026-06-26 | Danielle Mariani | Fixed three stale "Open Question #1" cross-references that should have read #5/#7 after the live-source question renumbering in v0.1.8 — confirmed the underlying SPEC.md and ARCHITECTURE.md work itself was already fully applied (BR-PLY-03 default, the "portrait" wording fix, and the NASA TV reference fix); this was a documentation cross-reference bug, not unfinished work |
 | 0.1.10 | 2026-06-26 | Danielle Mariani | `specs/design/design.md` completed using Dani's uploaded template, adapted for a dark-only theme (cyan accent, broadcast-red live/error, no separate light theme); moved from Pending to Completed Spec Documents; Next Step updated to starting feature specs under `specs/features/`, beginning with `catalog/` |
+| 0.1.11 | 2026-07-04 | Danielle Mariani | Catalog feature specs complete — `requirements.md` (v0.2.0), `design.md` (v0.1.1), `tasks.md` (v0.1.0) moved to Completed Spec Documents; `data-model.md` updated to v0.1.5 (static live entry IDs changed from slugs to stable UUIDs, BR-CAT-04 added); `design.md` updated to v0.1.1 (8s auto-advance carousel, Motion Guidelines corrected); added Open Questions #10 (Mux secret-in-client) and #11 (Mux asset naming convention); added pending action to record static live entry UUIDs at TSK-CAT-16; Next Step updated to `specs/features/media-player/` |
