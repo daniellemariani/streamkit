@@ -1,10 +1,10 @@
 # data-model.md — StreamKit
 
-**Version:** 0.1.4
+**Version:** 0.1.5
 **Status:** Draft
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-16
-**Last Updated:** 2026-06-26
+**Last Updated:** 2026-06-28
 **Location:** specs/technical/data-model.md
 
 ---
@@ -59,7 +59,7 @@ Represents a single catalog entry — either a VOD asset or a live stream.
 ```kotlin
 @Entity(tableName = "videos")
 data class VideoEntity(
-    @PrimaryKey val id: String,                   // Mux asset ID, or one of three static live keys (see below)
+    @PrimaryKey val id: String,                   // Mux asset ID (VOD) or stable UUID (Live static entries — see below)
     val title: String,
     val description: String?,
     val type: String,                             // "VOD" | "LIVE"
@@ -73,7 +73,8 @@ data class VideoEntity(
 ```
 
 **Notes:**
-- `id` for Mux VOD assets is the Mux asset ID (e.g. `"abc123xyz"`). The three live streams use static keys: `"redbull_tv"`, `"dw_english"`, and `"nhk_world"` — see `specs/technical/content-catalog.md` for the source and verification status of each.
+- `id` for Mux VOD assets is the Mux asset ID (e.g. `"abc123xyz"`). The three live streams use stable UUIDs assigned at implementation time and must never change across app updates — see `specs/features/catalog/requirements.md` RQ-CAT-20. Human-readable names (Red Bull TV, DW English, NHK World-Japan) are stored in `title`, not in `id`.
+- **Mux asset filtering (BR-CAT-04):** only Mux assets with `status == "ready"` are mapped into `VideoEntity` rows and written to the cache. Assets in `preparing`, `errored`, or any other status are excluded at the repository layer and must never appear in the catalog.
 - `streamUrl` is the Mux playback URL (VOD) or one of three live candidate URLs (live). The Red Bull TV candidate (`"https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8"`) is the most thoroughly checked of the three so far: it resolves with the correct `application/x-mpegURL` content type and the channel ID is referenced consistently across multiple third-party HLS aggregators, but manual playback testing did not produce video — the Akamai edge for this host has been observed returning `X-GeoBlock: true`, so geo-restriction is the suspected cause, but this is unconfirmed. The `dw_english` and `nhk_world` candidate URLs have had less verification depth (no HTTP/manifest check, only aggregator-list consistency). **None of the three should be treated as production-ready** — verify actual playback (e.g. via VLC or ExoPlayer directly, from the target network) before wiring any of them into Phase 1 implementation. See Open Schema Questions below and `content-catalog.md` for full detail on each.
 - `isDrmProtected` is always `false` through Phase 4. Set to `true` for Widevine-protected assets introduced in Phase 5.
 - The catalog is refreshed from the Mux API on each app launch. The Room cache is the read source for the catalog screen.
@@ -85,7 +86,7 @@ data class VideoEntity(
 
 ```sql
 CREATE TABLE videos (
-    id              VARCHAR(64) PRIMARY KEY,      -- Mux asset ID, or one of three static live keys
+    id              VARCHAR(64) PRIMARY KEY,      -- Mux asset ID (VOD) or stable UUID (Live static entries)
     title           VARCHAR(255) NOT NULL,
     description     TEXT,
     type            VARCHAR(8) NOT NULL,          -- 'VOD' | 'LIVE'
@@ -494,7 +495,7 @@ Full migration files live in `backend/migrations/` (Alembic). Each phase introdu
 
 | Entity | Android Room PK | PostgreSQL PK | Notes |
 |---|---|---|---|
-| `Video` | `String` (Mux asset ID or one of three static live keys) | `VARCHAR(64)` | Same value both sides — Mux ID or static key is the canonical key |
+| `Video` | `String` (Mux asset ID for VOD; stable UUID for the 3 static Live entries) | `VARCHAR(64)` | Same value both sides — Mux ID or UUID is the canonical key; human-readable names live in `title` only |
 | `PlaybackPosition` (Android) / `PlaybackSession` (Backend) | `String` (videoId, upserted) | `UUID` | Android stores one position row per video; backend stores full sessions |
 | `TelemetryEvent` | `String` (client UUID v4) | `UUID` | Same UUID both sides — enables idempotent flush |
 | `VideoRendition` | N/A | `UUID` | Backend only |
@@ -523,3 +524,4 @@ Full migration files live in `backend/migrations/` (Alembic). Each phase introdu
 | 0.1.2 | 2026-06-20 | Danielle Mariani | Replaced NASA TV with Red Bull TV's 24/7 "Best of Red Bull" stream as the live content source — NASA's 24/7 NTV1-HLS channel was discontinued in 2024 and its public stream URLs no longer resolve. Updated static key (`"redbull_tv"`), `streamUrl` example, and all related notes |
 | 0.1.3 | 2026-06-20 | Danielle Mariani | Flagged the Red Bull TV `streamUrl` as unverified — manual playback testing produced no video despite the URL resolving with a valid HLS content type; added as a blocking open question (#4) pending verification before Phase 1 implementation |
 | 0.1.4 | 2026-06-26 | Danielle Mariani | Generalized `Video.id` and related notes from a single static live key to three (`redbull_tv`, `dw_english`, `nhk_world`), per `navigation.md`'s 3-item Live carousel; added Open Schema Question #5 for the two new candidates' (unverified) playback status; no schema change required — `videos` already supported multiple `STATIC`/`LIVE` rows |
+| 0.1.5 | 2026-06-28 | Danielle Mariani | Updated static Live entry `id` from human-readable slugs (`redbull_tv` etc.) to stable UUIDs assigned at implementation time, per `specs/features/catalog/requirements.md` RQ-CAT-20; names remain in `title` field only. Added BR-CAT-04 as a Mux-mapping note: only assets with `status == "ready"` are mapped into `VideoEntity` and written to cache |
