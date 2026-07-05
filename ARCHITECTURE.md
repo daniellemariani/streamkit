@@ -1,10 +1,10 @@
 # ARCHITECTURE.md — StreamKit
 
-**Version:** 0.1.2
+**Version:** 0.1.3
 **Status:** Draft
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-15
-**Last Updated:** 2026-06-26
+**Last Updated:** 2026-07-04
 
 ---
 
@@ -48,13 +48,12 @@ streamkit/
 │       ├── data-model.md
 │       ├── api-contract.md
 │       └── content-catalog.md
-├── .cursor/
-│   └── rules/                       # AI coding rules (.mdc files)
 ├── PRODUCT.md
 ├── SPEC.md
 ├── ARCHITECTURE.md
 ├── ROADMAP.md
-└── CONTEXT.md
+├── CONTEXT.md
+└── CLAUDE.md                        # Claude Code project instructions
 ```
 
 ---
@@ -452,6 +451,7 @@ backend/
 | 0.1.0 | 2026-06-15 | Danielle Mariani | Initial draft |
 | 0.1.1 | 2026-06-20 | Danielle Mariani | Removed streaming-glossary.md since it is already defined in SPEC.md |
 | 0.1.2 | 2026-06-26 | Danielle Mariani | Added Screen Orientation subsection per `navigation.md`/`CONTEXT.md` — per-destination `requestedOrientation` handling (portrait-locked Catalog/Settings vs. sensor-driven Player/Live Player), with the maximize toggle and physical rotation treated as two inputs into the same state rather than separate ones; updated the Overview's module description to drop the blanket "portrait" descriptor for `app`; corrected a stale "NASA TV" reference in Related Documents to Red Bull TV |
+| 0.1.3 | 2026-07-04 | Danielle Mariani | Removed `.cursor/rules/` from Repository Structure — project no longer uses Cursor, Claude Code only. Added `CLAUDE.md` to the root file listing |
 
 ---
 
