@@ -1,10 +1,10 @@
 # Design System — StreamKit
 
-**Version:** 0.1.0
+**Version:** 0.1.1
 **Status:** Draft
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-26
-**Last Updated:** 2026-06-26
+**Last Updated:** 2026-07-04
 **Location:** specs/design/design.md
 
 ---
@@ -401,7 +401,7 @@ Motion supports comprehension and continuity. It should never feel playful or ca
 Recommended:
 - Short transitions (150–250ms) for orientation changes, the maximize/minimize toggle, and PiP enter/exit
 - A subtle fade for state changes (buffering → playing, error → recovered)
-- Manual swipe only on the Live carousel — no auto-advancing pager. Motion the viewer didn't initiate competes with the principle that chrome shouldn't call attention to itself
+- Manual swipe supported on the Live carousel; the carousel also auto-advances every 8 seconds, cyclically. A manual swipe resets the timer. Auto-advance pauses when the carousel is scrolled out of view. This is intentional: the Live section is at the top of the screen — passive browsing benefit outweighs the motion concern at this low frequency and slow interval
 - **The one deliberate exception:** Fire TV's D-pad focus state uses a visible scale-up (and accent-colored focus ring) on the focused card. This isn't decorative — on a 10-foot lean-back interface with no cursor or hover state, a strong focus affordance is the primary way a viewer knows what they're about to select. This is the one place motion is allowed to be more pronounced than everywhere else in the app.
 
 Avoid:
@@ -538,3 +538,4 @@ When in doubt, ask whether a design decision makes the content easier to watch a
 | Version | Date | Author | Notes |
 |---|---|---|---|
 | 0.1.0 | 2026-06-26 | Danielle Mariani | Initial draft — dark-only color system, typography, spacing/shape/elevation tokens, component patterns (cards, Live badge, progress indicators), motion, lightweight accessibility note, and Android/Fire TV platform adaptation. Built on the palette approved in chat and the screen behaviors locked in `navigation.md` |
+| 0.1.1 | 2026-07-04 | Danielle Mariani | Updated Motion Guidelines: Live carousel now auto-advances every 8s (cyclic); manual swipe resets the timer; pauses when out of view. Replaces prior "manual swipe only" guidance, per decision in `specs/features/catalog/design.md` |
