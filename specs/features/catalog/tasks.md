@@ -1,6 +1,6 @@
 # Catalog — Tasks
 
-**Version:** 0.1.0
+**Version:** 0.1.1
 **Status:** Draft
 **Phase:** 1 (Android)
 **Owner:** Danielle Mariani
@@ -189,7 +189,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
   - `android/core/src/main/java/com/streamkit/core/data/local/VideoEntity.kt`
   - `android/core/src/main/java/com/streamkit/core/data/local/StreamKitDatabase.kt`
 - Details:
-  Define `VideoEntity` per `specs/technical/data-model.md`. Required fields: `id` (String, primary key), `title`, `description`, `type` (enum: VOD / LIVE / STATIC), `thumbnailUrl`, `streamUrl`, `durationSeconds` (nullable), `isDrmProtected`, `createdAt`, `updatedAt`.
+  Define `VideoEntity` per `specs/technical/data-model.md`. Required fields: `id` (String, primary key), `title`, `description`, `type` (enum: VOD / LIVE), `thumbnailUrl`, `streamUrl`, `durationSeconds` (nullable), `isDrmProtected`, `createdAt`, `updatedAt`.
 
   `StreamKitDatabase` is a Room `@Database` with `entities = [VideoEntity::class]`, `version = 1`. Include a `fun videoDao(): VideoDao` abstract accessor. No migration strategy needed for Phase 1 — destructive migration is acceptable.
 
@@ -210,7 +210,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 
   - `@Upsert fun upsertAll(videos: List<VideoEntity>)` — used by both seeding and sync
   - `@Query fun observeVodItems(): Flow<List<VideoEntity>>` — filters `type = 'VOD'`, `status = 'ready'` (BR-CAT-04)
-  - `@Query fun observeLiveItems(): Flow<List<VideoEntity>>` — filters `type = 'LIVE'` or `type = 'STATIC'`
+  - `@Query fun observeLiveItems(): Flow<List<VideoEntity>>` — filters `type = 'LIVE'`
   - `@Query fun getLiveIds(): List<String>` — returns IDs of all non-VOD rows; used by `deleteStale`
   - `@Query fun deleteStale(activeIds: List<String>)` — deletes rows whose `id` is not in `activeIds`; called after a successful Mux sync with `activeIds = freshVodIds + liveIds`
 
@@ -420,7 +420,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Details:
   Define a `LiveSeedConfig` object with a `val entries: List<VideoEntity>` containing the 3 static live entries (Red Bull TV, DW English, NHK World-Japan). Each entry must have:
   - A hardcoded, stable UUID as `id` (assign here — once set, never change)
-  - `type = VideoType.STATIC`
+  - `type = VideoType.LIVE`
   - `streamUrl` per the candidate URLs in `specs/technical/content-catalog.md`
   - `isDrmProtected = false`
   - `durationSeconds = null`
@@ -822,7 +822,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
   Test cases per `specs/features/catalog/design.md` — Testing Strategy section:
   - `upsertAll` with 3 live entries → `observeLiveItems()` emits exactly 3 rows
   - Second `upsertAll` with same entries → no duplicates
-  - `observeVodItems()` never returns STATIC or LIVE type rows
+  - `observeVodItems()` never returns LIVE type rows
   - `deleteStale(activeIds = freshVodIds + liveIds)` removes stale VOD rows only
   - `deleteStale` does not delete live entries when their IDs are included in `activeIds`
   - Assets with `status != "ready"` filtered by DAO query — do not appear in `observeVodItems()` emission
@@ -834,3 +834,4 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | Version | Date | Author | Notes |
 |---|---|---|---|
 | 0.1.0 | 2026-07-04 | Danielle Mariani | Initial draft — 34 tasks across 10 groups covering project foundation through testing; tasks intentionally scoped to single-file or tightly related file pairs for reviewable PRs |
+| 0.1.1 | 2026-07-04 | Danielle Mariani | Fixed `VideoType` enum discrepancy found during pre-implementation review: TSK-CAT-05, TSK-CAT-06, TSK-CAT-16, and TSK-CAT-34 incorrectly described a 3-value Android enum (`VOD/LIVE/STATIC`); corrected to match `data-model.md`'s authoritative 2-value enum (`VOD/LIVE`). All three seeded Live entries now specified as `type = VideoType.LIVE`, consistent with `data-model.md` Open Schema Question #3 (no Android `source` field in Phase 1) |
