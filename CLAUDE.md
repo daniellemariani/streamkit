@@ -21,6 +21,29 @@ Module rules: `app → core`, `tv → core`, never `app ↔ tv`. Full layout in 
 - Changelogs are newest-first.
 
 ## Workflow
-Work task-by-task from `specs/features/<feature>/tasks.md`. 
-Before starting: confirm `Depends on` tasks are done. 
-After finishing: update task status; flag any knock-on doc updates rather than making them silently.
+- Work task-by-task from `specs/features/<feature>/tasks.md`.
+- Before starting: confirm `Depends on` tasks are done.
+- Follow the task spec exactly — do not add anything not specified.
+- If anything is ambiguous or requires an architectural decision not covered by the spec, stop and ask — do not assume.
+- After finishing: update task status (both the summary table and the task's own `Status:` field in `tasks.md`); flag any knock-on doc updates rather than making them silently.
+
+When I say **"Approved"** or **"Approved and commit"**:
+- Commit all files associated with the current task
+- Use the task ID and title as the commit message (e.g. `feat(android): TSK-CAT-01 — <task title>`)
+- Do not include co-author attribution
+
+## Git
+
+- Conventional Commits format
+- Feature branches: `feature/xxx`
+- Spec changes and code changes in separate commits
+
+### Git Commit Standards
+- Follow Conventional Commits: feat:, fix:, chore:, docs:, refactor:
+- Scope commits to the affected module: feat(android): feat(backend):, docs:
+- The title must be under 50 characters and in the present tense
+- Separate title from body with a blank line
+- Use a bulleted list in the body for multiple changes
+- Each commit must represent a single logical change
+- Avoid mixing refactor + feature in the same commit
+- Ensure commits are meaningful and reviewable
