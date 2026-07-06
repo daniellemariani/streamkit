@@ -1,6 +1,6 @@
 # Catalog — Tasks
 
-**Version:** 0.1.1
+**Version:** 0.1.2
 **Status:** Draft
 **Phase:** 1 (Android)
 **Owner:** Danielle Mariani
@@ -37,7 +37,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 
 | ID | Title | Group | Effort | Status |
 |---|---|---|---|---|
-| TSK-CAT-01 | Create Android project skeleton | Project Foundation | M | Not Started |
+| TSK-CAT-01 | Create Android project skeleton | Project Foundation | M | Done |
 | TSK-CAT-02 | Set up base package structure | Project Foundation | S | Not Started |
 | TSK-CAT-03 | Configure AppTheme | Project Foundation | M | Not Started |
 | TSK-CAT-04 | Configure Hilt application module | Project Foundation | S | Not Started |
@@ -84,7 +84,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: Project Foundation
 - Requirements: —
 - Acceptance Criteria: —
-- Status: Not Started
+- Status: Done
 - Depends on: None
 - Creates:
   - `android/settings.gradle.kts`
@@ -105,7 +105,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
   - `tv` depends on `core`
   - Neither `app` nor `tv` declares a dependency on each other
 
-  Package name: `com.streamkit` (apply consistently across all modules).
+  Package name: `com.dmariani.streamkit` (apply consistently across all modules).
   Min SDK: 31 | Target SDK: 35 | Compile SDK: 35
 
 ---
@@ -119,15 +119,15 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-01
 - Creates:
-  - `android/core/src/main/java/com/streamkit/core/domain/model/` (empty)
-  - `android/core/src/main/java/com/streamkit/core/domain/repository/` (empty)
-  - `android/core/src/main/java/com/streamkit/core/data/local/` (empty)
-  - `android/core/src/main/java/com/streamkit/core/data/remote/` (empty)
-  - `android/core/src/main/java/com/streamkit/core/data/repository/` (empty)
-  - `android/core/src/main/java/com/streamkit/core/di/` (empty)
-  - `android/core/src/main/java/com/streamkit/core/ui/components/` (empty)
-  - `android/app/src/main/java/com/streamkit/app/ui/navigation/` (empty)
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/` (empty)
+  - `android/core/src/main/java/com/dmariani/streamkit/core/domain/model/` (empty)
+  - `android/core/src/main/java/com/dmariani/streamkit/core/domain/repository/` (empty)
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/local/` (empty)
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/remote/` (empty)
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/repository/` (empty)
+  - `android/core/src/main/java/com/dmariani/streamkit/core/di/` (empty)
+  - `android/core/src/main/java/com/dmariani/streamkit/core/ui/components/` (empty)
+  - `android/app/src/main/java/com/dmariani/streamkit/app/ui/navigation/` (empty)
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/` (empty)
 - Details:
   Create the directory scaffolding per `ARCHITECTURE.md`. No Kotlin files yet — package-level `.gitkeep` files only if needed to preserve empty directories in Git.
 
@@ -142,9 +142,9 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-01
 - Creates:
-  - `android/core/src/main/java/com/streamkit/core/ui/theme/Color.kt`
-  - `android/core/src/main/java/com/streamkit/core/ui/theme/Type.kt`
-  - `android/core/src/main/java/com/streamkit/core/ui/theme/Theme.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/ui/theme/Color.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/ui/theme/Type.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/ui/theme/Theme.kt`
 - Details:
   Map all design tokens from `specs/design/design.md` to Material 3.
 
@@ -167,7 +167,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-01
 - Creates:
-  - `android/app/src/main/java/com/streamkit/app/StreamKitApp.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/StreamKitApp.kt`
 - Details:
   Annotate `StreamKitApp : Application()` with `@HiltAndroidApp`. Register it in `AndroidManifest.xml` (`android:name=".StreamKitApp"`). No DI modules yet — those come in later tasks.
 
@@ -186,8 +186,8 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-04
 - Creates:
-  - `android/core/src/main/java/com/streamkit/core/data/local/VideoEntity.kt`
-  - `android/core/src/main/java/com/streamkit/core/data/local/StreamKitDatabase.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/local/VideoEntity.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/local/StreamKitDatabase.kt`
 - Details:
   Define `VideoEntity` per `specs/technical/data-model.md`. Required fields: `id` (String, primary key), `title`, `description`, `type` (enum: VOD / LIVE), `thumbnailUrl`, `streamUrl`, `durationSeconds` (nullable), `isDrmProtected`, `createdAt`, `updatedAt`.
 
@@ -204,7 +204,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-05
 - Creates:
-  - `android/core/src/main/java/com/streamkit/core/data/local/VideoDao.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/local/VideoDao.kt`
 - Details:
   Define all DAO methods needed by the Catalog data layer:
 
@@ -231,7 +231,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-04
 - Creates:
-  - `android/core/src/main/java/com/streamkit/core/di/NetworkModule.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/di/NetworkModule.kt`
 - Details:
   Define a Hilt `@Module @InstallIn(SingletonComponent::class)` that provides a singleton Ktor `HttpClient` configured with:
   - `ContentNegotiation` plugin with `json()` (kotlinx.serialization)
@@ -251,7 +251,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-07
 - Creates:
-  - `android/core/src/main/java/com/streamkit/core/data/remote/MuxAssetDto.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/remote/MuxAssetDto.kt`
 - Details:
   Define `@Serializable` DTOs matching the Mux `GET /video/v1/assets` response shape:
 
@@ -272,7 +272,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-08
 - Creates:
-  - `android/core/src/main/java/com/streamkit/core/data/remote/MuxApiClient.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/remote/MuxApiClient.kt`
 - Details:
   Implement `suspend fun listAssets(): Result<List<MuxAssetDto>>`.
 
@@ -295,8 +295,8 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-05
 - Creates:
-  - `android/core/src/main/java/com/streamkit/core/domain/repository/VideoRepository.kt`
-  - `android/core/src/main/java/com/streamkit/core/domain/model/Video.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/domain/repository/VideoRepository.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/domain/model/Video.kt`
 - Details:
   Define the `Video` domain model (mirrors `VideoEntity` fields; no Room annotations) and the `VideoRepository` interface with:
 
@@ -318,7 +318,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-06, TSK-CAT-10
 - Creates:
-  - `android/core/src/main/java/com/streamkit/core/data/repository/VideoRepositoryImpl.kt` (partial — observe methods only)
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/repository/VideoRepositoryImpl.kt` (partial — observe methods only)
 - Details:
   Implement `observeVodItems()` and `observeLiveItems()` by delegating to `VideoDao` and mapping `VideoEntity → Video` via a private `VideoEntity.toDomain()` extension. Keep the mapper in the same file for now.
 
@@ -335,7 +335,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-11, TSK-CAT-16
 - Modifies:
-  - `android/core/src/main/java/com/streamkit/core/data/repository/VideoRepositoryImpl.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/repository/VideoRepositoryImpl.kt`
 - Details:
   Implement `seedLiveEntries()`. Read the 3 static `VideoEntity` definitions from `LiveSeedConfig` (created in TSK-CAT-16), call `videoDao.upsertAll(liveEntries)`, return `Result.success(Unit)`.
 
@@ -352,7 +352,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-09, TSK-CAT-12
 - Modifies:
-  - `android/core/src/main/java/com/streamkit/core/data/repository/VideoRepositoryImpl.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/repository/VideoRepositoryImpl.kt`
 - Details:
   Implement `syncVodCatalog()`:
 
@@ -377,8 +377,8 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-13
 - Creates:
-  - `android/core/src/main/java/com/streamkit/core/di/DatabaseModule.kt`
-  - `android/core/src/main/java/com/streamkit/core/di/RepositoryModule.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/di/DatabaseModule.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/di/RepositoryModule.kt`
 - Details:
   **`DatabaseModule`:** `@Singleton` `StreamKitDatabase` built with `Room.databaseBuilder`. Provide `VideoDao` from the database instance.
 
@@ -416,7 +416,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-05
 - Creates:
-  - `android/core/src/main/java/com/streamkit/core/data/local/LiveSeedConfig.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/local/LiveSeedConfig.kt`
 - Details:
   Define a `LiveSeedConfig` object with a `val entries: List<VideoEntity>` containing the 3 static live entries (Red Bull TV, DW English, NHK World-Japan). Each entry must have:
   - A hardcoded, stable UUID as `id` (assign here — once set, never change)
@@ -442,9 +442,9 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-14, TSK-CAT-15
 - Creates:
-  - `android/app/src/main/java/com/streamkit/app/ui/MainActivity.kt`
-  - `android/app/src/main/java/com/streamkit/app/ui/navigation/AppNavGraph.kt`
-  - `android/app/src/main/java/com/streamkit/app/ui/navigation/AppRoutes.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/ui/MainActivity.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/ui/navigation/AppNavGraph.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/ui/navigation/AppRoutes.kt`
 - Details:
   **`AppRoutes`:** define route constants and builder functions per `specs/features/catalog/design.md` — Navigation section. `CATALOG` is the start destination.
 
@@ -467,7 +467,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-10
 - Creates:
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/domain/SeedLiveEntriesUseCase.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/domain/SeedLiveEntriesUseCase.kt`
 - Details:
   Single-purpose use case: `suspend fun execute(): Result<Unit>` delegates to `videoRepository.seedLiveEntries()` and returns the result as-is. `@Inject constructor(private val videoRepository: VideoRepository)`.
 
@@ -482,7 +482,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-10
 - Creates:
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/domain/SyncVodCatalogUseCase.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/domain/SyncVodCatalogUseCase.kt`
 - Details:
   Single-purpose use case: `suspend fun execute(): Result<Unit>` delegates to `videoRepository.syncVodCatalog()` and returns the result as-is. `@Inject constructor(private val videoRepository: VideoRepository)`.
 
@@ -501,7 +501,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-10
 - Creates:
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/ui/CatalogUiState.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/CatalogUiState.kt`
 - Details:
   Define all MVI data types in a single file per `specs/features/catalog/design.md` — Data Models section:
   - `CatalogUiState` data class
@@ -522,7 +522,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-18, TSK-CAT-19, TSK-CAT-20
 - Creates:
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/ui/CatalogViewModel.kt` (partial — init only)
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/CatalogViewModel.kt` (partial — init only)
 - Details:
   Implement `CatalogViewModel : ViewModel()` with `@HiltViewModel @Inject constructor`.
 
@@ -545,7 +545,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-21
 - Modifies:
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/ui/CatalogViewModel.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/CatalogViewModel.kt`
 - Details:
   Add `fun onEvent(event: CatalogEvent)` and `private suspend fun syncVodCatalog()` per `specs/features/catalog/design.md` — ViewModel section.
 
@@ -572,7 +572,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-03
 - Creates:
-  - `android/core/src/main/java/com/streamkit/core/ui/components/LiveBadge.kt`
+  - `android/core/src/main/java/com/dmariani/streamkit/core/ui/components/LiveBadge.kt`
 - Details:
   Implement per `specs/design/design.md` — Live Badge section:
   - Solid `color.semantic.error` (`#FF3B3F`) background
@@ -599,7 +599,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-03, TSK-CAT-15
 - Creates:
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/ui/components/CatalogTopAppBar.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/components/CatalogTopAppBar.kt`
 - Details:
   Material 3 `TopAppBar` with `containerColor = color.background.primary`. Title: `Text(stringResource(R.string.catalog_app_bar_title), style = Heading1, color = TextPrimary)`. Action: `IconButton` with `Icons.Outlined.Settings` (20dp), `contentDescription = stringResource(R.string.catalog_settings_icon_description)`, `tint = TextSecondary`. On click: invoke `onSettingsTapped` callback. No elevation.
 
@@ -614,7 +614,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-03
 - Creates:
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/ui/components/VodPosterCard.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/components/VodPosterCard.kt`
 - Details:
   Implement per `specs/features/catalog/design.md` — VodPosterCard section. `Column` with `AsyncImage` (aspect ratio 2:3, `ContentScale.Crop`, `radius.lg` clip) and `Text` label below (Body Small, TextPrimary, `maxLines = 2`, `TextOverflow.Ellipsis`, `spacing.xs` top padding). The entire card is wrapped in a `Modifier.clickable { onTap(video.id) }`.
 
@@ -631,7 +631,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-03
 - Creates:
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/ui/components/VodSkeletonGrid.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/components/VodSkeletonGrid.kt`
 - Details:
   Render 6 placeholder cards in a 2-column arrangement (not lazy — fixed count). Each card matches `VodPosterCard`'s dimensions: `fillMaxWidth()`, aspect ratio 2:3, `radius.lg` clip, background `color.surface.alt`.
 
@@ -650,8 +650,8 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-03, TSK-CAT-15
 - Creates:
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/ui/components/CatalogEmptyState.kt`
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/ui/components/CatalogErrorState.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/components/CatalogEmptyState.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/components/CatalogErrorState.kt`
 - Details:
   Both composables follow the anatomy in `specs/features/catalog/design.md` — centered `Column` with icon + message text (± retry button for error). Keep in separate files for clarity.
 
@@ -670,7 +670,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-23, TSK-CAT-03
 - Creates:
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/ui/components/LiveCarouselCard.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/components/LiveCarouselCard.kt`
 - Details:
   Implement per `specs/features/catalog/design.md` — LiveCarousel section (card anatomy). A `Box` with `fillMaxWidth()`, `aspectRatio(16f / 9f)`, `radius.lg` clip, `color.surface.card` background, wrapped in `Modifier.clickable { onTap(video.id) }`.
 
@@ -691,7 +691,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-28
 - Creates:
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/ui/components/LiveCarousel.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/components/LiveCarousel.kt`
 - Details:
   Implement `LiveCarousel(items: List<Video>, isVisible: Boolean, onItemClick: (String) -> Unit)` per `specs/features/catalog/design.md` — LiveCarousel and Auto-Advance Implementation Note sections.
 
@@ -710,7 +710,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-25, TSK-CAT-26, TSK-CAT-27
 - Creates:
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/ui/components/VodGrid.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/components/VodGrid.kt`
 - Details:
   A non-composable router function (or a `@Composable` that switches on `vodState`) rather than a full lazy layout — it returns the appropriate content for the caller (`CatalogScreen`'s `LazyVerticalGrid`) to place as full-span or cell items.
 
@@ -738,7 +738,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-17, TSK-CAT-21, TSK-CAT-22, TSK-CAT-24, TSK-CAT-29, TSK-CAT-30
 - Creates:
-  - `android/app/src/main/java/com/streamkit/app/feature/catalog/ui/CatalogScreen.kt`
+  - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/CatalogScreen.kt`
 - Details:
   Root composable for the Catalog destination. Collects `uiState` via `collectAsStateWithLifecycle()`. Collects `uiEffect` in a `LaunchedEffect(Unit)` and calls `navController.navigate(...)` for each effect.
 
@@ -769,7 +769,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-21, TSK-CAT-22
 - Creates:
-  - `android/app/src/test/java/com/streamkit/app/feature/catalog/CatalogViewModelTest.kt`
+  - `android/app/src/test/java/com/dmariani/streamkit/app/feature/catalog/CatalogViewModelTest.kt`
 - Details:
   Use `kotlinx-coroutines-test` with `StandardTestDispatcher`. Use hand-written fakes for `SeedLiveEntriesUseCase`, `SyncVodCatalogUseCase`, and `VideoRepository` — avoid Mockito.
 
@@ -796,8 +796,8 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-18, TSK-CAT-19
 - Creates:
-  - `android/app/src/test/java/com/streamkit/app/feature/catalog/SyncVodCatalogUseCaseTest.kt`
-  - `android/app/src/test/java/com/streamkit/app/feature/catalog/SeedLiveEntriesUseCaseTest.kt`
+  - `android/app/src/test/java/com/dmariani/streamkit/app/feature/catalog/SyncVodCatalogUseCaseTest.kt`
+  - `android/app/src/test/java/com/dmariani/streamkit/app/feature/catalog/SeedLiveEntriesUseCaseTest.kt`
 - Details:
   Both use cases delegate directly to the repository. Test cases:
   - Happy path: `Result.success` returned when repository succeeds
@@ -815,7 +815,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Status: Not Started
 - Depends on: TSK-CAT-06, TSK-CAT-13
 - Creates:
-  - `android/core/src/androidTest/java/com/streamkit/core/data/VideoRoomIntegrationTest.kt`
+  - `android/core/src/androidTest/java/com/dmariani/streamkit/core/data/VideoRoomIntegrationTest.kt`
 - Details:
   Use `Room.inMemoryDatabaseBuilder` with a fresh instance per test. Instrumented tests (run on device or emulator).
 
@@ -835,3 +835,4 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 |---|---|---|---|
 | 0.1.0 | 2026-07-04 | Danielle Mariani | Initial draft — 34 tasks across 10 groups covering project foundation through testing; tasks intentionally scoped to single-file or tightly related file pairs for reviewable PRs |
 | 0.1.1 | 2026-07-04 | Danielle Mariani | Fixed `VideoType` enum discrepancy found during pre-implementation review: TSK-CAT-05, TSK-CAT-06, TSK-CAT-16, and TSK-CAT-34 incorrectly described a 3-value Android enum (`VOD/LIVE/STATIC`); corrected to match `data-model.md`'s authoritative 2-value enum (`VOD/LIVE`). All three seeded Live entries now specified as `type = VideoType.LIVE`, consistent with `data-model.md` Open Schema Question #3 (no Android `source` field in Phase 1) |
+| 0.1.2 | 2026-07-04 | Danielle Mariani | Changed package name from `com.streamkit` to `com.dmariani.streamkit` throughout (personal-project preference) — updated all 50 file path references across every task's `Creates:`/`Modifies:` list, and TSK-CAT-01's package name declaration |
