@@ -1,0 +1,16 @@
+# ============================================================
+# ANDROID
+# ============================================================
+*.iml
+.gradle/
+local.properties
+.idea/
+*.keystore
+!debug.keystore
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
