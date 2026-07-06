@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.streamkit.app"
+    namespace = "com.dmariani.streamkit.app"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.streamkit.app"
+        applicationId = "com.dmariani.streamkit.app"
         minSdk = 31
         targetSdk = 35
         versionCode = 1

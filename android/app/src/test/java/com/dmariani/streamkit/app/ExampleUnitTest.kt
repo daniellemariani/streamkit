@@ -1,4 +1,4 @@
-package com.streamkit.app
+package com.dmariani.streamkit.app
 
 import org.junit.Test
 

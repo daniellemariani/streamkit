@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.streamkit.core"
+    namespace = "com.dmariani.streamkit.core"
     compileSdk = 37
 
     defaultConfig {

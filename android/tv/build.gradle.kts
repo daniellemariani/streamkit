@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.streamkit.tv"
+    namespace = "com.dmariani.streamkit.tv"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.streamkit.tv"
+        applicationId = "com.dmariani.streamkit.tv"
         minSdk = 31
         targetSdk = 35
         versionCode = 1
