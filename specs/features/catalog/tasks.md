@@ -47,7 +47,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | TSK-CAT-08 | Define Mux network DTOs | Network Foundation | S | Done |
 | TSK-CAT-09 | Implement MuxApiClient.listAssets() | Network Foundation | M | Done |
 | TSK-CAT-10 | Define VideoRepository interface | Data Layer | S | Done |
-| TSK-CAT-11 | Implement VideoRepositoryImpl — observe queries | Data Layer | S | Not Started |
+| TSK-CAT-11 | Implement VideoRepositoryImpl — observe queries | Data Layer | S | Done |
 | TSK-CAT-12 | Implement VideoRepositoryImpl — seedLiveEntries() | Data Layer | S | Not Started |
 | TSK-CAT-13 | Implement VideoRepositoryImpl — syncVodCatalog() | Data Layer | M | Not Started |
 | TSK-CAT-14 | Implement DatabaseModule and RepositoryModule | Data Layer | S | Not Started |
@@ -315,7 +315,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: Data Layer
 - Requirements: RQ-CAT-08, RQ-CAT-11, RQ-CAT-12
 - Acceptance Criteria: AC-CAT-01, AC-CAT-02
-- Status: Not Started
+- Status: Done
 - Depends on: TSK-CAT-06, TSK-CAT-10
 - Creates:
   - `android/core/src/main/java/com/dmariani/streamkit/core/data/repository/VideoRepositoryImpl.kt` (partial — observe methods only)
