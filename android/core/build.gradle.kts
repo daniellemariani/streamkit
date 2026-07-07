@@ -1,9 +1,18 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt.android)
+}
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        load(localPropertiesFile.inputStream())
+    }
 }
 
 android {
@@ -13,6 +22,17 @@ android {
     defaultConfig {
         minSdk = 31
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "MUX_TOKEN_ID",
+            "\"${localProperties.getProperty("MUX_TOKEN_ID", "")}\"",
+        )
+        buildConfigField(
+            "String",
+            "MUX_TOKEN_SECRET",
+            "\"${localProperties.getProperty("MUX_TOKEN_SECRET", "")}\"",
+        )
     }
 
     buildTypes {
@@ -26,6 +46,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -57,6 +78,7 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.auth)
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.kotlinx.coroutines.core)
