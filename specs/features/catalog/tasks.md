@@ -46,7 +46,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | TSK-CAT-07 | Configure Ktor HttpClient and NetworkModule | Network Foundation | S | Done |
 | TSK-CAT-08 | Define Mux network DTOs | Network Foundation | S | Done |
 | TSK-CAT-09 | Implement MuxApiClient.listAssets() | Network Foundation | M | Done |
-| TSK-CAT-10 | Define VideoRepository interface | Data Layer | S | Not Started |
+| TSK-CAT-10 | Define VideoRepository interface | Data Layer | S | Done |
 | TSK-CAT-11 | Implement VideoRepositoryImpl — observe queries | Data Layer | S | Not Started |
 | TSK-CAT-12 | Implement VideoRepositoryImpl — seedLiveEntries() | Data Layer | S | Not Started |
 | TSK-CAT-13 | Implement VideoRepositoryImpl — syncVodCatalog() | Data Layer | M | Not Started |
@@ -292,7 +292,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: Data Layer
 - Requirements: RQ-CAT-11, RQ-CAT-12, RQ-CAT-13, RQ-CAT-14, RQ-CAT-17, RQ-CAT-21
 - Acceptance Criteria: —
-- Status: Not Started
+- Status: Done
 - Depends on: TSK-CAT-05
 - Creates:
   - `android/core/src/main/java/com/dmariani/streamkit/core/domain/repository/VideoRepository.kt`
