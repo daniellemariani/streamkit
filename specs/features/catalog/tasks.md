@@ -38,7 +38,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | ID | Title | Group | Effort | Status |
 |---|---|---|---|---|
 | TSK-CAT-01 | Create Android project skeleton | Project Foundation | M | Done |
-| TSK-CAT-02 | Set up base package structure | Project Foundation | S | Not Started |
+| TSK-CAT-02 | Set up base package structure | Project Foundation | S | Done |
 | TSK-CAT-03 | Configure AppTheme | Project Foundation | M | Not Started |
 | TSK-CAT-04 | Configure Hilt application module | Project Foundation | S | Not Started |
 | TSK-CAT-05 | Define VideoEntity and StreamKitDatabase | Database Foundation | S | Not Started |
@@ -116,7 +116,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: Project Foundation
 - Requirements: —
 - Acceptance Criteria: —
-- Status: Not Started
+- Status: Done
 - Depends on: TSK-CAT-01
 - Creates:
   - `android/core/src/main/java/com/dmariani/streamkit/core/domain/model/` (empty)
