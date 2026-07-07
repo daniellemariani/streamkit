@@ -18,6 +18,10 @@ import io.ktor.serialization.kotlinx.json.json
 import javax.inject.Singleton
 import kotlinx.serialization.json.Json
 
+/**
+ * Provides the singleton Ktor `HttpClient` used for all network calls,
+ * configured with JSON, logging, timeouts, and Mux Basic Auth.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {

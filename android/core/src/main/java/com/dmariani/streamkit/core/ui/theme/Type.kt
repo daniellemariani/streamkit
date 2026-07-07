@@ -5,6 +5,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
+/**
+ * StreamKit's typography scale — maps the 7 design roles from
+ * `specs/design/design.md` to Compose `TextStyle`s.
+ */
 object StreamKitTypography {
     val Heading1 = TextStyle(
         fontSize = 22.sp,

@@ -5,6 +5,10 @@ import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Room DAO for the `videos` table — backs the catalog cache read by the
+ * Catalog screen and written by Mux sync / static live seeding.
+ */
 @Dao
 interface VideoDao {
     @Upsert

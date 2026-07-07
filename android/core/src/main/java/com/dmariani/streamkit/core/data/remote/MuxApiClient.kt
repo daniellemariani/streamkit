@@ -6,6 +6,10 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import javax.inject.Inject
 
+/**
+ * Thin client over Mux's `List Assets` endpoint — pages through all results
+ * and returns them as a single list.
+ */
 class MuxApiClient @Inject constructor(
     private val httpClient: HttpClient,
 ) {
