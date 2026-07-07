@@ -1,10 +1,10 @@
 # Design System — StreamKit
 
-**Version:** 0.1.1
+**Version:** 0.1.2
 **Status:** Draft
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-26
-**Last Updated:** 2026-07-04
+**Last Updated:** 2026-07-07
 **Location:** specs/design/design.md
 
 ---
@@ -438,11 +438,32 @@ Android uses **Material 3** as the foundational design system (`ARCHITECTURE.md`
 | `primary` | `color.accent.primary` |
 | `onPrimary` | `color.accent.on` |
 | `background` | `color.background.primary` |
+| `onBackground` | `color.text.primary` |
 | `surface` | `color.surface.card` |
+| `onSurface` | `color.text.primary` |
 | `surfaceVariant` | `color.surface.alt` |
+| `onSurfaceVariant` | `color.text.secondary` |
 | `outline` | `color.border.default` |
 | `error` | `color.semantic.error` |
 | `onError` | `color.accent.on` |
+
+`secondary`, `tertiary`, and their `on*`/`*Container` counterparts are intentionally left at Material 3 defaults — StreamKit's palette defines a single accent (Signal-Accent principle, above) and has no secondary or tertiary hue. No component in this design system references these roles.
+
+### Typography Mapping
+
+`StreamKitTypography`'s roles (defined in Typography, above) map onto Material 3's `Typography` object so stock Material composables that read `MaterialTheme.typography.*` internally (default `Text()` style, `Button`, `TopAppBar` title, `Tab` labels) stay visually consistent without needing to reference `StreamKitTypography` explicitly everywhere.
+
+| StreamKit Role | M3 Typography Role |
+|---|---|
+| Heading 1 | `titleLarge` |
+| Heading 2 | `titleMedium` |
+| Body | `bodyLarge` |
+| Body Small | `bodyMedium` |
+| Label | `labelLarge` |
+| Caption | `labelSmall` |
+| Data (mono) | *(no M3 mapping — diagnostics-only, referenced directly via `StreamKitTypography`, never a stock component default)* |
+
+`StreamKitTypography` remains the source of truth, exposed via its own `CompositionLocal`; the M3 `Typography` object above exists solely so unstyled Material internals fall back to the correct scale rather than generic Material defaults.
 
 ---
 
@@ -539,3 +560,4 @@ When in doubt, ask whether a design decision makes the content easier to watch a
 |---|---|---|---|
 | 0.1.0 | 2026-06-26 | Danielle Mariani | Initial draft — dark-only color system, typography, spacing/shape/elevation tokens, component patterns (cards, Live badge, progress indicators), motion, lightweight accessibility note, and Android/Fire TV platform adaptation. Built on the palette approved in chat and the screen behaviors locked in `navigation.md` |
 | 0.1.1 | 2026-07-04 | Danielle Mariani | Updated Motion Guidelines: Live carousel now auto-advances every 8s (cyclic); manual swipe resets the timer; pauses when out of view. Replaces prior "manual swipe only" guidance, per decision in `specs/features/catalog/design.md` |
+| 0.1.2 | 2026-07-07 | Danielle Mariani | Gaps found during TSK-CAT-03 implementation: added `onBackground`/`onSurface`/`onSurfaceVariant` to the Material 3 Role table (mapped to `color.text.primary`/`color.text.secondary`), with a note that `secondary`/`tertiary` are intentionally left at Material defaults since StreamKit has no secondary/tertiary accent; added a new Typography Mapping table (StreamKit roles → M3 `Typography` roles) so stock Material components fall back to the correct scale |

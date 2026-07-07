@@ -1,11 +1,11 @@
 # Catalog — Tasks
 
-**Version:** 0.1.3
+**Version:** 0.1.4
 **Status:** Draft
 **Phase:** 1 (Android)
 **Owner:** Danielle Mariani
 **Created at:** 2026-07-04
-**Last Updated:** 2026-07-06
+**Last Updated:** 2026-07-07
 
 ---
 
@@ -238,7 +238,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
   - `Logging` plugin (log level `INFO` for debug builds only)
   - Default request timeout of 15s
 
-  The Mux Token ID and Secret are read from `BuildConfig` fields sourced from `local.properties` (never hardcoded, never committed). The client is configured with Basic Auth using those values. See `specs/features/catalog/requirements.md` DS-CAT-05.
+  The Mux Token ID and Secret are read from `BuildConfig` fields sourced from `local.properties` (never hardcoded, never committed). The client is configured with Basic Auth using those values. See the "Mux API credentials" row in `specs/features/catalog/requirements.md`'s Dependencies table.
 
 ---
 
@@ -836,3 +836,4 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | 0.1.1 | 2026-07-04 | Danielle Mariani | Fixed `VideoType` enum discrepancy found during pre-implementation review: TSK-CAT-05, TSK-CAT-06, TSK-CAT-16, and TSK-CAT-34 incorrectly described a 3-value Android enum (`VOD/LIVE/STATIC`); corrected to match `data-model.md`'s authoritative 2-value enum (`VOD/LIVE`). All three seeded Live entries now specified as `type = VideoType.LIVE`, consistent with `data-model.md` Open Schema Question #3 (no Android `source` field in Phase 1) |
 | 0.1.2 | 2026-07-04 | Danielle Mariani | Changed package name from `com.streamkit` to `com.dmariani.streamkit` throughout (personal-project preference) — updated all 50 file path references across every task's `Creates:`/`Modifies:` list, and TSK-CAT-01's package name declaration |
 | 0.1.3 | 2026-07-06 | Danielle Mariani | Corrections found during TSK-CAT-01/05/06 implementation: (1) TSK-CAT-01 — `Compile SDK: 35` → `37`, required by current stable `core-ktx`/`activity-compose`/`lifecycle-*`; (2) TSK-CAT-05 — removed "destructive migration acceptable," which contradicted `data-model.md`'s "not permitted in any phase"; added `exportSchema = true` and `room.schemaLocation` config pointed at `android/schemas/`, per `data-model.md`; (3) TSK-CAT-06 — `observeVodItems()` no longer specifies a `status = 'ready'` DAO filter, since `VideoEntity` has no `status` column and BR-CAT-04 filtering happens upstream at the repository layer, before upsert; (4) TSK-CAT-34 — removed the corresponding stale test case referencing a DAO-level `status` filter |
+| 0.1.4 | 2026-07-07 | Danielle Mariani | TSK-CAT-07 — fixed dangling cross-reference to a nonexistent `requirements.md` DS-CAT-05 ID (no `DS-*` ID scheme exists in `requirements.md`/`SPEC.md`); pointed instead to the "Mux API credentials" row in `requirements.md`'s Dependencies table, which is the actual source of the credential-handling rule |
