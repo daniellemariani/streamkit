@@ -1,11 +1,11 @@
 # Catalog — Tasks
 
-**Version:** 0.1.2
+**Version:** 0.1.3
 **Status:** Draft
 **Phase:** 1 (Android)
 **Owner:** Danielle Mariani
 **Created at:** 2026-07-04
-**Last Updated:** 2026-07-04
+**Last Updated:** 2026-07-06
 
 ---
 
@@ -106,7 +106,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
   - Neither `app` nor `tv` declares a dependency on each other
 
   Package name: `com.dmariani.streamkit` (apply consistently across all modules).
-  Min SDK: 31 | Target SDK: 35 | Compile SDK: 35
+  Min SDK: 31 | Target SDK: 35 | Compile SDK: 37
 
 ---
 
@@ -191,7 +191,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Details:
   Define `VideoEntity` per `specs/technical/data-model.md`. Required fields: `id` (String, primary key), `title`, `description`, `type` (enum: VOD / LIVE), `thumbnailUrl`, `streamUrl`, `durationSeconds` (nullable), `isDrmProtected`, `createdAt`, `updatedAt`.
 
-  `StreamKitDatabase` is a Room `@Database` with `entities = [VideoEntity::class]`, `version = 1`. Include a `fun videoDao(): VideoDao` abstract accessor. No migration strategy needed for Phase 1 — destructive migration is acceptable.
+  `StreamKitDatabase` is a Room `@Database` with `entities = [VideoEntity::class]`, `version = 1`, `exportSchema = true` (per `data-model.md` — destructive migration is not permitted in any phase). Include a `fun videoDao(): VideoDao` abstract accessor. Configure `room.schemaLocation` (KSP arg in `core/build.gradle.kts`) to `$rootDir/schemas`, so exported schema JSON lands at `android/schemas/` and is committed to source control per `data-model.md`.
 
 ---
 
@@ -209,7 +209,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
   Define all DAO methods needed by the Catalog data layer:
 
   - `@Upsert fun upsertAll(videos: List<VideoEntity>)` — used by both seeding and sync
-  - `@Query fun observeVodItems(): Flow<List<VideoEntity>>` — filters `type = 'VOD'`, `status = 'ready'` (BR-CAT-04)
+  - `@Query fun observeVodItems(): Flow<List<VideoEntity>>` — filters `type = 'VOD'`. No `status` filter needed at the DAO layer — `VideoEntity` has no `status` column; BR-CAT-04's `status == "ready"` filtering happens upstream, at the repository layer, before any row is upserted (see `data-model.md`)
   - `@Query fun observeLiveItems(): Flow<List<VideoEntity>>` — filters `type = 'LIVE'`
   - `@Query fun getLiveIds(): List<String>` — returns IDs of all non-VOD rows; used by `deleteStale`
   - `@Query fun deleteStale(activeIds: List<String>)` — deletes rows whose `id` is not in `activeIds`; called after a successful Mux sync with `activeIds = freshVodIds + liveIds`
@@ -825,7 +825,6 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
   - `observeVodItems()` never returns LIVE type rows
   - `deleteStale(activeIds = freshVodIds + liveIds)` removes stale VOD rows only
   - `deleteStale` does not delete live entries when their IDs are included in `activeIds`
-  - Assets with `status != "ready"` filtered by DAO query — do not appear in `observeVodItems()` emission
 
 ---
 
@@ -836,3 +835,4 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | 0.1.0 | 2026-07-04 | Danielle Mariani | Initial draft — 34 tasks across 10 groups covering project foundation through testing; tasks intentionally scoped to single-file or tightly related file pairs for reviewable PRs |
 | 0.1.1 | 2026-07-04 | Danielle Mariani | Fixed `VideoType` enum discrepancy found during pre-implementation review: TSK-CAT-05, TSK-CAT-06, TSK-CAT-16, and TSK-CAT-34 incorrectly described a 3-value Android enum (`VOD/LIVE/STATIC`); corrected to match `data-model.md`'s authoritative 2-value enum (`VOD/LIVE`). All three seeded Live entries now specified as `type = VideoType.LIVE`, consistent with `data-model.md` Open Schema Question #3 (no Android `source` field in Phase 1) |
 | 0.1.2 | 2026-07-04 | Danielle Mariani | Changed package name from `com.streamkit` to `com.dmariani.streamkit` throughout (personal-project preference) — updated all 50 file path references across every task's `Creates:`/`Modifies:` list, and TSK-CAT-01's package name declaration |
+| 0.1.3 | 2026-07-06 | Danielle Mariani | Corrections found during TSK-CAT-01/05/06 implementation: (1) TSK-CAT-01 — `Compile SDK: 35` → `37`, required by current stable `core-ktx`/`activity-compose`/`lifecycle-*`; (2) TSK-CAT-05 — removed "destructive migration acceptable," which contradicted `data-model.md`'s "not permitted in any phase"; added `exportSchema = true` and `room.schemaLocation` config pointed at `android/schemas/`, per `data-model.md`; (3) TSK-CAT-06 — `observeVodItems()` no longer specifies a `status = 'ready'` DAO filter, since `VideoEntity` has no `status` column and BR-CAT-04 filtering happens upstream at the repository layer, before upsert; (4) TSK-CAT-34 — removed the corresponding stale test case referencing a DAO-level `status` filter |
