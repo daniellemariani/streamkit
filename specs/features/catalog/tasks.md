@@ -45,7 +45,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | TSK-CAT-06 | Define VideoDao | Database Foundation | M | Done |
 | TSK-CAT-07 | Configure Ktor HttpClient and NetworkModule | Network Foundation | S | Done |
 | TSK-CAT-08 | Define Mux network DTOs | Network Foundation | S | Done |
-| TSK-CAT-09 | Implement MuxApiClient.listAssets() | Network Foundation | M | Not Started |
+| TSK-CAT-09 | Implement MuxApiClient.listAssets() | Network Foundation | M | Done |
 | TSK-CAT-10 | Define VideoRepository interface | Data Layer | S | Not Started |
 | TSK-CAT-11 | Implement VideoRepositoryImpl — observe queries | Data Layer | S | Not Started |
 | TSK-CAT-12 | Implement VideoRepositoryImpl — seedLiveEntries() | Data Layer | S | Not Started |
@@ -269,7 +269,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: Network Foundation
 - Requirements: RQ-CAT-14
 - Acceptance Criteria: —
-- Status: Not Started
+- Status: Done
 - Depends on: TSK-CAT-08
 - Creates:
   - `android/core/src/main/java/com/dmariani/streamkit/core/data/remote/MuxApiClient.kt`
