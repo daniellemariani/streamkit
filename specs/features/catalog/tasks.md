@@ -41,7 +41,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | TSK-CAT-02 | Set up base package structure | Project Foundation | S | Done |
 | TSK-CAT-03 | Configure AppTheme | Project Foundation | M | Done |
 | TSK-CAT-04 | Configure Hilt application module | Project Foundation | S | Done |
-| TSK-CAT-05 | Define VideoEntity and StreamKitDatabase | Database Foundation | S | Not Started |
+| TSK-CAT-05 | Define VideoEntity and StreamKitDatabase | Database Foundation | S | Done |
 | TSK-CAT-06 | Define VideoDao | Database Foundation | M | Not Started |
 | TSK-CAT-07 | Configure Ktor HttpClient and NetworkModule | Network Foundation | S | Not Started |
 | TSK-CAT-08 | Define Mux network DTOs | Network Foundation | S | Not Started |
@@ -183,7 +183,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: Database Foundation
 - Requirements: RQ-CAT-17, RQ-CAT-20
 - Acceptance Criteria: —
-- Status: Not Started
+- Status: Done
 - Depends on: TSK-CAT-04
 - Creates:
   - `android/core/src/main/java/com/dmariani/streamkit/core/data/local/VideoEntity.kt`
