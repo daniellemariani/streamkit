@@ -1,11 +1,11 @@
 # Catalog — Requirements
 
-**Version:** 0.2.0
+**Version:** 0.2.1
 **Status:** Draft
 **Phase:** 1 (Android)
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-28
-**Last Updated:** 2026-06-28
+**Last Updated:** 2026-07-07
 
 ---
 
@@ -122,9 +122,9 @@ The 3 Live entries are seeded directly into the `videos` Room table on first app
 
 | UUID | Title | Notes |
 |---|---|---|
-| _(assigned at implementation)_ | Red Bull TV | Candidate URL, unverified |
-| _(assigned at implementation)_ | DW English | Candidate URL, unverified |
-| _(assigned at implementation)_ | NHK World-Japan | Candidate URL, unverified |
+| _(assigned at runtime, on first app launch)_ | Red Bull TV | Candidate URL, unverified |
+| _(assigned at runtime, on first app launch)_ | DW English | Candidate URL, unverified |
+| _(assigned at runtime, on first app launch)_ | NHK World-Japan | Candidate URL, unverified |
 
 **RQ-CAT-21 — Stale row cleanup**
 Following a successful Mux fetch, Mux-sourced rows no longer present in the latest response are deleted from the cache via `VideoDao.deleteStale`. Static Live entries are excluded from this deletion and are never removed by a Mux sync.
@@ -219,7 +219,7 @@ Then the Settings screen opens.
 | Room database, `Video` entity | Internal | Entity schema defined in `data-model.md`; `VideoDao.deleteStale` must support excluding seeded/static rows by type or origin flag |
 | Mux API credentials (Token ID + Secret) | Internal | `GET /video/v1/assets` requires Basic Auth. The secret is embedded in the Android client — an accepted risk for this non-distributed project; stored via `local.properties`/`BuildConfig`, never committed, consistent with `ARCHITECTURE.md`'s existing "no secrets committed" rule |
 | Settings environment flag | Internal | Phase 1 "Local" environment is inert — Catalog always sources VOD from Mux regardless of the Settings picker state |
-| Static live config source | Internal | The 3 `Video` rows in RQ-CAT-20 live in `core` static config; UUIDs are assigned at implementation time and must remain stable across app updates |
+| Static live config source | Internal | The 3 `Video` rows in RQ-CAT-20 live in `core` static config; UUIDs are generated once at runtime, on first app launch, and must remain stable across app updates thereafter |
 | Design tokens: poster aspect ratio, LIVE badge color | Design | Defined in `design.md` (broadcast red for Live badge per the locked color palette) |
 
 ---
@@ -242,3 +242,4 @@ Full Fire TV spec is defined in `specs/features/fire-tv/requirements.md` at Phas
 |---|---|---|---|
 | 0.1.0 | 2026-06-28 | Danielle Mariani | Initial draft. Mux `List Assets` confirmed as the real Phase 1 VOD source. Surfaced two items not previously captured elsewhere: the `status == "ready"` filter (BR-CAT-04) and the Mux secret-in-client dependency |
 | 0.2.0 | 2026-06-28 | Danielle Mariani | Added top app bar requirements (RQ-CAT-01–03, AC-CAT-09). Simplified VOD empty state to neutral message (RQ-CAT-13). Updated static live seeding to use UUIDs as `Video.id` (RQ-CAT-20). Clarified BR-CAT-04 promotion to `data-model.md`. Removed template note on ID abbreviation length |
+| 0.2.1 | 2026-07-07 | Danielle Mariani | Corrected RQ-CAT-20's UUID table and the "Static live config source" Dependencies row — both said UUIDs are "assigned at implementation" (hardcoded by the developer at coding time). Revised during TSK-CAT-12/16 implementation: the UUIDs are now generated with a real random-UUID call exactly once, on the device's genuine first app launch (detected via `VideoDao.getLiveIds()` being empty), rather than hardcoded as source constants. Reworded both to "assigned at runtime, on first app launch" |

@@ -1,10 +1,10 @@
 # CONTEXT.md — StreamKit
 
-**Version:** 0.1.11
+**Version:** 0.1.14
 **Status:** Active
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-16
-**Last Updated:** 2026-07-04
+**Last Updated:** 2026-07-07
 
 ---
 
@@ -137,12 +137,12 @@ Persisted in DataStore. Injected at the `NetworkModule` level.
 | `ARCHITECTURE.md` | ✅ Complete | v0.1.2 — added Screen Orientation subsection (per-destination `requestedOrientation` handling); orientation note from Pending Document Updates is now applied |
 | `ROADMAP.md` | ✅ Complete | v0.1.0 |
 | `CONTEXT.md` | ✅ Complete | v0.1.10 |
-| `specs/technical/data-model.md` | ✅ Complete | v0.1.5 — static Live entry `id` changed from human-readable slugs to stable UUIDs (assigned at TSK-CAT-16); names remain in `title` field only. Added BR-CAT-04 as a Mux-mapping rule: only assets with `status == "ready"` are mapped into `VideoEntity` and written to cache |
+| `specs/technical/data-model.md` | ✅ Complete | v0.1.6 — static Live entry `id` changed from human-readable slugs to stable UUIDs (generated once at runtime, on genuine first app launch); names remain in `title` field only. Added BR-CAT-04 as a Mux-mapping rule: only assets with `status == "ready"` are mapped into `VideoEntity` and written to cache |
 | `specs/technical/api-contract.md` | ✅ Complete | v0.1.0 — covers Phase 4 (ingestion), Phase 5 (DRM), Phase 6 (telemetry); no auth/tenancy, no sync API (not applicable to StreamKit) |
 | `specs/technical/content-catalog.md` | ✅ Complete | v0.1.1 — added Live Source 2 (DW English) and Live Source 3 (NHK World-Japan) as proposed candidates, both unverified and pending Dani's confirmation |
 | `specs/design/navigation.md` | ✅ Complete | v0.1.3 — Catalog, Live Player, Player, and Settings screen flows, route inventory, global nav patterns. Bitrate/resolution/buffer overlay default on; that document's own internal Open Question #1 (live carousel sources) updated to reflect proposed candidates — see this file's Open Questions #5/#7 for the consolidated tracking |
 | `specs/design/design.md` | ✅ Complete | v0.1.1 — Motion Guidelines updated: Live carousel now auto-advances every 8s (cyclic); manual swipe resets the timer; pauses when out of view. Replaces prior "manual swipe only" guidance per decision made during the Catalog feature design session |
-| `specs/features/catalog/requirements.md` | ✅ Complete | v0.2.0 — Mux `List Assets` confirmed as real Phase 1 VOD source; Live carousel specced against real candidate URLs; BR-CAT-04 (`status == "ready"` filter) added as feature-specific rule and promoted to `data-model.md`; top app bar (plain text label + gear icon) added; static live entry IDs specified as UUIDs; VOD empty state simplified to neutral message |
+| `specs/features/catalog/requirements.md` | ✅ Complete | v0.2.1 — Mux `List Assets` confirmed as real Phase 1 VOD source; Live carousel specced against real candidate URLs; BR-CAT-04 (`status == "ready"` filter) added as feature-specific rule and promoted to `data-model.md`; top app bar (plain text label + gear icon) added; static live entry IDs specified as UUIDs generated once at runtime on first launch; VOD empty state simplified to neutral message |
 | `specs/features/catalog/design.md` | ✅ Complete | v0.1.1 — `LazyVerticalGrid` as root layout (nested lazy constraint); MVI with `CatalogUiState`/`CatalogEvent`/`CatalogUiEffect`; 16:9 Live carousel cards, 2:3 VOD poster cards; `LiveCarousel` auto-advance with 8s interval, `settledPage`-keyed `LaunchedEffect`, `isVisible` pause via `LazyGridState`; `VodGrid` implemented as `LazyGridScope` extension |
 | `specs/features/catalog/tasks.md` | ✅ Complete | v0.1.0 — 34 tasks across 10 groups; tasks intentionally single-file scoped for reviewable PRs; Group 0 (Project Foundation) included since Catalog is Phase 1's first feature |
 
@@ -152,7 +152,7 @@ Persisted in DataStore. Injected at the `NetworkModule` level.
 
 | Document | Status | Notes |
 |---|---|---|
-| `specs/features/catalog/` | ✅ Complete | requirements.md (v0.2.0), design.md (v0.1.1), tasks.md (v0.1.0) — see Completed Spec Documents |
+| `specs/features/catalog/` | ✅ Complete | requirements.md (v0.2.1), design.md (v0.1.1), tasks.md (v0.1.5) — see Completed Spec Documents |
 | `specs/features/media-player/` | Not Started | requirements.md, design.md, tasks.md |
 | `specs/features/live-player/` | Not Started | requirements.md, design.md, tasks.md |
 | `specs/features/pip/` | Not Started | requirements.md, design.md, tasks.md |
@@ -202,7 +202,7 @@ These are changes `navigation.md`'s decisions imply for other documents. Tracked
 
 ### Catalog session — pending implementation actions
 
-- **Static live entry UUIDs** — three stable UUIDs must be assigned and hardcoded at TSK-CAT-16 (`LiveSeedConfig.kt`). Once assigned, record all three here in `CONTEXT.md` so they are never accidentally changed. _(Pending implementation)_
+- **Static live entry UUIDs** — revised 2026-07-07: no longer hardcoded at implementation time. `LiveSeedConfig.kt` (TSK-CAT-16) now holds only title/description/streamUrl/durationSeconds/isDrmProtected for the 3 Live entries; `VideoRepositoryImpl.seedLiveEntries()` (TSK-CAT-12) checks `VideoDao.getLiveIds()` and, only if empty (genuine first launch), generates a random UUID + real timestamp per entry and upserts once. Every later call sees existing rows and no-ops. The IDs are therefore only knowable by inspecting a real device/emulator's Room database after first launch, not by reading source — still stable and never regenerated once seeded, satisfying RQ-CAT-20's intent. `requirements.md` (RQ-CAT-20, v0.2.1) and `data-model.md` (v0.1.6) have both been reworded from "assigned at implementation" to "assigned at runtime, on first app launch" to match.
 
 - No changes needed for Phase 1 — the new Settings diagnostics (bytes downloaded, network type, dropped frames) are local ExoPlayer/Media3 analytics with no backend dependency yet. Worth revisiting at Phase 6 kickoff if any get promoted into `TelemetryEventType`.
 
@@ -242,7 +242,7 @@ Full schema is defined in `specs/technical/data-model.md` (complete as of v0.1.3
 
 ## Next Step
 
-**Catalog feature specs are complete** (`requirements.md` v0.2.0, `design.md` v0.1.1, `tasks.md` v0.1.0).
+**Catalog feature specs are complete** (`requirements.md` v0.2.1, `design.md` v0.1.1, `tasks.md` v0.1.5).
 
 The natural next feature spec is **`specs/features/media-player/`** — Player is entered exclusively from the Catalog VOD grid and is the core Phase 1 deliverable alongside Catalog.
 
@@ -272,3 +272,6 @@ Start a new chat session and reference this file (`CONTEXT.md`) plus `SPEC.md`, 
 | 0.1.9 | 2026-06-26 | Danielle Mariani | Fixed three stale "Open Question #1" cross-references that should have read #5/#7 after the live-source question renumbering in v0.1.8 — confirmed the underlying SPEC.md and ARCHITECTURE.md work itself was already fully applied (BR-PLY-03 default, the "portrait" wording fix, and the NASA TV reference fix); this was a documentation cross-reference bug, not unfinished work |
 | 0.1.10 | 2026-06-26 | Danielle Mariani | `specs/design/design.md` completed using Dani's uploaded template, adapted for a dark-only theme (cyan accent, broadcast-red live/error, no separate light theme); moved from Pending to Completed Spec Documents; Next Step updated to starting feature specs under `specs/features/`, beginning with `catalog/` |
 | 0.1.11 | 2026-07-04 | Danielle Mariani | Catalog feature specs complete — `requirements.md` (v0.2.0), `design.md` (v0.1.1), `tasks.md` (v0.1.0) moved to Completed Spec Documents; `data-model.md` updated to v0.1.5 (static live entry IDs changed from slugs to stable UUIDs, BR-CAT-04 added); `design.md` updated to v0.1.1 (8s auto-advance carousel, Motion Guidelines corrected); added Open Questions #10 (Mux secret-in-client) and #11 (Mux asset naming convention); added pending action to record static live entry UUIDs at TSK-CAT-16; Next Step updated to `specs/features/media-player/` |
+| 0.1.12 | 2026-07-07 | Danielle Mariani | TSK-CAT-16 implemented (`LiveSeedConfig.kt`) — recorded the 3 assigned, stable static live entry UUIDs (Red Bull TV, DW English, NHK World-Japan) in the Catalog session pending-actions section |
+| 0.1.13 | 2026-07-07 | Danielle Mariani | Revised the Live seeding design: `LiveSeedConfig.kt` no longer hardcodes `id`/`createdAt`/`updatedAt` — `VideoRepositoryImpl.seedLiveEntries()` now generates a random UUID and real timestamp exactly once, on genuine first launch (detected via `VideoDao.getLiveIds()` being empty), rather than at implementation time. Removed the now-inaccurate hardcoded UUID table from the Catalog session pending-actions section; flagged that RQ-CAT-20/`data-model.md`'s "assigned at implementation time" wording is now stale and needs a reword, not yet applied |
+| 0.1.14 | 2026-07-07 | Danielle Mariani | Applied the reword flagged in v0.1.13: `requirements.md` (RQ-CAT-20 table + Dependencies row, → v0.2.1) and `data-model.md` (`Video` entity note, → v0.1.6) both changed from "assigned at implementation time" to "assigned at runtime, on first app launch"; updated version references to both files throughout this document |
