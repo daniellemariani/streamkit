@@ -4,9 +4,13 @@ import com.dmariani.streamkit.core.data.local.LiveSeedConfig
 import com.dmariani.streamkit.core.data.local.VideoDao
 import com.dmariani.streamkit.core.data.local.VideoEntity
 import com.dmariani.streamkit.core.data.local.VideoType
+import com.dmariani.streamkit.core.data.remote.MuxApiClient
+import com.dmariani.streamkit.core.data.remote.MuxAssetDto
+import com.dmariani.streamkit.core.data.remote.MuxPlaybackIdDto
 import com.dmariani.streamkit.core.domain.model.Video
 import com.dmariani.streamkit.core.domain.repository.VideoRepository
 import javax.inject.Inject
+import kotlin.math.roundToInt
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 import kotlinx.coroutines.flow.Flow
@@ -18,6 +22,7 @@ import kotlinx.coroutines.flow.map
  */
 class VideoRepositoryImpl @Inject constructor(
     private val videoDao: VideoDao,
+    private val muxApiClient: MuxApiClient,
 ) : VideoRepository {
 
     override fun observeVodItems(): Flow<List<Video>> =
@@ -52,7 +57,36 @@ class VideoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun syncVodCatalog(): Result<Unit> {
-        TODO("Implemented in TSK-CAT-13")
+        val assets = muxApiClient.listAssets().getOrElse { return Result.failure(it) }
+        return try {
+            val freshEntities = assets
+                .filter { it.status == MuxAssetDto.STATUS_READY }
+                .mapNotNull { it.toVideoEntity() }
+            videoDao.upsertAll(freshEntities)
+            val liveIds = videoDao.getLiveIds()
+            videoDao.deleteStale(activeIds = freshEntities.map { it.id } + liveIds)
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    private fun MuxAssetDto.toVideoEntity(): VideoEntity? {
+        val playbackId = playbackIds?.firstOrNull { it.policy == MuxPlaybackIdDto.POLICY_PUBLIC }?.id
+            ?: return null
+        val now = System.currentTimeMillis()
+        return VideoEntity(
+            id = id,
+            title = id,
+            description = null,
+            type = VideoType.VOD.name,
+            thumbnailUrl = "https://image.mux.com/$playbackId/thumbnail.jpg",
+            streamUrl = "https://stream.mux.com/$playbackId.m3u8",
+            durationSeconds = duration?.roundToInt(),
+            isDrmProtected = false,
+            createdAt = now,
+            updatedAt = now,
+        )
     }
 
     private fun VideoEntity.toDomain() = Video(

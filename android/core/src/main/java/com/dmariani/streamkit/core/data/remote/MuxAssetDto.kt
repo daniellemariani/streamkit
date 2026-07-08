@@ -23,7 +23,11 @@ data class MuxAssetDto(
     val status: String,
     val duration: Double?,
     @SerialName("playback_ids") val playbackIds: List<MuxPlaybackIdDto>?,
-)
+) {
+    companion object {
+        const val STATUS_READY = "ready"
+    }
+}
 
 /**
  * A single playback ID on a Mux asset, used to derive thumbnail and
@@ -33,4 +37,8 @@ data class MuxAssetDto(
 data class MuxPlaybackIdDto(
     val id: String,
     val policy: String,
-)
+) {
+    companion object {
+        const val POLICY_PUBLIC = "public"
+    }
+}
