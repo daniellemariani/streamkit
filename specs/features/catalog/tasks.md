@@ -1,6 +1,6 @@
 # Catalog — Tasks
 
-**Version:** 0.1.4
+**Version:** 0.1.5
 **Status:** Draft
 **Phase:** 1 (Android)
 **Owner:** Danielle Mariani
@@ -48,11 +48,11 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | TSK-CAT-09 | Implement MuxApiClient.listAssets() | Network Foundation | M | Done |
 | TSK-CAT-10 | Define VideoRepository interface | Data Layer | S | Done |
 | TSK-CAT-11 | Implement VideoRepositoryImpl — observe queries | Data Layer | S | Done |
-| TSK-CAT-12 | Implement VideoRepositoryImpl — seedLiveEntries() | Data Layer | S | Not Started |
+| TSK-CAT-12 | Implement VideoRepositoryImpl — seedLiveEntries() | Data Layer | S | Done |
 | TSK-CAT-13 | Implement VideoRepositoryImpl — syncVodCatalog() | Data Layer | M | Not Started |
 | TSK-CAT-14 | Implement DatabaseModule and RepositoryModule | Data Layer | S | Not Started |
 | TSK-CAT-15 | Define catalog string resources | Constants & Resources | S | Not Started |
-| TSK-CAT-16 | Define static live entry seed config | Constants & Resources | S | Not Started |
+| TSK-CAT-16 | Define static live entry seed config | Constants & Resources | S | Done |
 | TSK-CAT-17 | Implement MainActivity and AppNavGraph shell | Navigation Shell | M | Not Started |
 | TSK-CAT-18 | Implement SeedLiveEntriesUseCase | Use Cases | S | Not Started |
 | TSK-CAT-19 | Implement SyncVodCatalogUseCase | Use Cases | S | Not Started |
@@ -332,14 +332,14 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: Data Layer
 - Requirements: RQ-CAT-20, RQ-CAT-21
 - Acceptance Criteria: AC-CAT-07
-- Status: Not Started
+- Status: Done
 - Depends on: TSK-CAT-11, TSK-CAT-16
 - Modifies:
   - `android/core/src/main/java/com/dmariani/streamkit/core/data/repository/VideoRepositoryImpl.kt`
 - Details:
-  Implement `seedLiveEntries()`. Read the 3 static `VideoEntity` definitions from `LiveSeedConfig` (created in TSK-CAT-16), call `videoDao.upsertAll(liveEntries)`, return `Result.success(Unit)`.
+  Implement `seedLiveEntries()`. Call `videoDao.getLiveIds()` first — if non-empty, live entries are already seeded, return `Result.success(Unit)` with no write. If empty (genuine first launch), map each `LiveSeedConfig.Entry` into a `VideoEntity` with `id = Uuid.random().toString()` and `createdAt = updatedAt = System.currentTimeMillis()` (same value for both, generated once), then call `videoDao.upsertAll(liveEntries)`, return `Result.success(Unit)`.
 
-  Must be idempotent: `@Upsert` ensures repeated calls produce no duplicates and do not overwrite existing data. Wrap in `try/catch` and return `Result.failure(e)` on any DAO exception.
+  **Revised 2026-07-07** (see TSK-CAT-16): idempotency no longer relies solely on `@Upsert`'s replace-on-conflict behavior — the `getLiveIds()` check makes repeat calls a true no-op (no DAO write at all), which is a stronger guarantee than "no duplicates" alone. Wrap the whole body in `try/catch` and return `Result.failure(e)` on any DAO exception.
 
 ---
 
@@ -413,19 +413,14 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: Constants & Resources
 - Requirements: RQ-CAT-20
 - Acceptance Criteria: AC-CAT-07
-- Status: Not Started
+- Status: Done
 - Depends on: TSK-CAT-05
 - Creates:
   - `android/core/src/main/java/com/dmariani/streamkit/core/data/local/LiveSeedConfig.kt`
 - Details:
-  Define a `LiveSeedConfig` object with a `val entries: List<VideoEntity>` containing the 3 static live entries (Red Bull TV, DW English, NHK World-Japan). Each entry must have:
-  - A hardcoded, stable UUID as `id` (assign here — once set, never change)
-  - `type = VideoType.LIVE`
-  - `streamUrl` per the candidate URLs in `specs/technical/content-catalog.md`
-  - `isDrmProtected = false`
-  - `durationSeconds = null`
+  Define a `LiveSeedConfig` object holding only the static metadata for the 3 Live entries (Red Bull TV, DW English, NHK World-Japan) as a `List<LiveSeedConfig.Entry>`: `title`, `description`, `streamUrl` (per the candidate URLs in `specs/technical/content-catalog.md`), `durationSeconds = null`, `isDrmProtected = false`.
 
-  These IDs fulfill RQ-CAT-20's "assigned at implementation time" requirement. Record the three assigned UUIDs in a comment at the top of this file and in `CONTEXT.md`.
+  **Revised 2026-07-07:** `id`/`createdAt`/`updatedAt` are deliberately *not* part of this config — they are no longer compile-time constants. `VideoRepositoryImpl.seedLiveEntries()` (TSK-CAT-12) generates a random UUID and real timestamp for each entry exactly once, on genuine first app launch, and persists them via Room from then on. This still fulfills RQ-CAT-20's stability intent (never regenerated once seeded); `requirements.md` (RQ-CAT-20, v0.2.1) and `data-model.md` (v0.1.6) have been reworded from "assigned at implementation time" to "assigned at runtime, on first app launch" to match.
 
 ---
 
@@ -837,3 +832,4 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | 0.1.2 | 2026-07-04 | Danielle Mariani | Changed package name from `com.streamkit` to `com.dmariani.streamkit` throughout (personal-project preference) — updated all 50 file path references across every task's `Creates:`/`Modifies:` list, and TSK-CAT-01's package name declaration |
 | 0.1.3 | 2026-07-06 | Danielle Mariani | Corrections found during TSK-CAT-01/05/06 implementation: (1) TSK-CAT-01 — `Compile SDK: 35` → `37`, required by current stable `core-ktx`/`activity-compose`/`lifecycle-*`; (2) TSK-CAT-05 — removed "destructive migration acceptable," which contradicted `data-model.md`'s "not permitted in any phase"; added `exportSchema = true` and `room.schemaLocation` config pointed at `android/schemas/`, per `data-model.md`; (3) TSK-CAT-06 — `observeVodItems()` no longer specifies a `status = 'ready'` DAO filter, since `VideoEntity` has no `status` column and BR-CAT-04 filtering happens upstream at the repository layer, before upsert; (4) TSK-CAT-34 — removed the corresponding stale test case referencing a DAO-level `status` filter |
 | 0.1.4 | 2026-07-07 | Danielle Mariani | TSK-CAT-07 — fixed dangling cross-reference to a nonexistent `requirements.md` DS-CAT-05 ID (no `DS-*` ID scheme exists in `requirements.md`/`SPEC.md`); pointed instead to the "Mux API credentials" row in `requirements.md`'s Dependencies table, which is the actual source of the credential-handling rule |
+| 0.1.5 | 2026-07-07 | Danielle Mariani | Revised Live seeding design found during TSK-CAT-12/16 implementation: `LiveSeedConfig` no longer hardcodes `id`/`createdAt`/`updatedAt` as compile-time constants — `VideoRepositoryImpl.seedLiveEntries()` now generates a random UUID and real timestamp exactly once, on genuine first launch (detected via `VideoDao.getLiveIds()` being empty). Updated both tasks' Details text to match; flagged that RQ-CAT-20/`data-model.md`'s "assigned at implementation time" wording is now stale (not yet reworded) |
