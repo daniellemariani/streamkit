@@ -53,7 +53,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | TSK-CAT-14 | Implement DatabaseModule and RepositoryModule | Data Layer | S | Done |
 | TSK-CAT-15 | Define catalog string resources | Constants & Resources | S | Done |
 | TSK-CAT-16 | Define static live entry seed config | Constants & Resources | S | Done |
-| TSK-CAT-17 | Implement MainActivity and AppNavGraph shell | Navigation Shell | M | Not Started |
+| TSK-CAT-17 | Implement MainActivity and AppNavGraph shell | Navigation Shell | M | Done |
 | TSK-CAT-18 | Implement SeedLiveEntriesUseCase | Use Cases | S | Not Started |
 | TSK-CAT-19 | Implement SyncVodCatalogUseCase | Use Cases | S | Not Started |
 | TSK-CAT-20 | Define CatalogUiState, VodState, CatalogEvent, CatalogUiEffect | ViewModel | S | Not Started |
@@ -434,7 +434,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: Navigation Shell
 - Requirements: RQ-CAT-01, RQ-CAT-03, RQ-CAT-06, RQ-CAT-09
 - Acceptance Criteria: AC-CAT-08, AC-CAT-09
-- Status: Not Started
+- Status: Done
 - Depends on: TSK-CAT-14, TSK-CAT-15
 - Creates:
   - `android/app/src/main/java/com/dmariani/streamkit/app/ui/MainActivity.kt`
