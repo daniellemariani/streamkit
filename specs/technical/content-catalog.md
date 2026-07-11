@@ -1,10 +1,10 @@
 # content-catalog.md — StreamKit
 
-**Version:** 0.1.1
+**Version:** 0.1.2
 **Status:** Draft
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-20
-**Last Updated:** 2026-06-26
+**Last Updated:** 2026-07-10
 **Location:** specs/technical/content-catalog.md
 
 ---
@@ -63,13 +63,27 @@ This section documents the **expected shape** of Mux-sourced content, to be fill
 | `Video` field | Mux source | Notes |
 |---|---|---|
 | `id` | Mux Asset ID | e.g. a string like `"a1b2c3d4e5"` — assigned by Mux on upload, not chosen by StreamKit |
-| `title` | Set manually in Mux dashboard, or via passthrough metadata at upload | Mux doesn't enforce a title field on the asset itself — StreamKit will need a convention (see Open Questions) |
-| `description` | Same as `title` — not a native Mux asset field | |
+| `title` | Parsed from the asset's `passthrough` field — JSON set at upload time: `{"title": "...", "description": "..."}` | Falls back to the Mux asset `id` if `passthrough` is missing or fails to parse. See "Naming Convention" below and `specs/features/catalog/requirements.md` RQ-CAT-18/19 |
+| `description` | Parsed from the same `passthrough` JSON | Falls back to `null` if missing or fails to parse |
 | `type` | Always `"VOD"` for Mux-sourced content | Mux is not used for StreamKit's live sources |
 | `thumbnail_url` | Mux's auto-generated thumbnail endpoint (`https://image.mux.com/{PLAYBACK_ID}/thumbnail.jpg`) | Requires the asset's Playback ID, not the Asset ID |
 | `stream_url` | Mux's HLS playback URL (`https://stream.mux.com/{PLAYBACK_ID}.m3u8`) | This is what ExoPlayer actually loads |
 | `duration_seconds` | Returned by the Mux Asset API after upload processing completes | Not available until the asset finishes processing |
 | `is_drm_protected` | `false` for all Phase 1–4 Mux content | Mux supports DRM on paid tiers; StreamKit does not exercise this — Widevine in Phase 5 is proxied through StreamKit's own backend, not Mux's |
+
+### Naming Convention — Resolved (`passthrough` metadata)
+
+Resolves the naming-convention half of Open Question #2 below. At upload time, each asset's `passthrough` field is set to a JSON string carrying human-readable metadata, e.g.:
+
+```json
+{"title": "Trip to Spain", "description": "Summer 2024 travel clip"}
+```
+
+Mux does not read, validate, or derive this from the uploaded filename — it stores whatever string is sent and echoes it back unchanged on every API response (`GET /video/v1/assets` and webhooks alike). The Android client parses this string on catalog sync and maps it to `Video.title` / `Video.description`.
+
+If `passthrough` is missing, blank, or fails to parse, `title` falls back to the Mux asset `id` and `description` falls back to `null` — the same fallback previously documented as the default behavior, now scoped to the error path only.
+
+Uploading a file named, say, `trip_spain.mp4` does **not** by itself populate `title` — the original filename is discarded by Mux after upload. The `passthrough` JSON must be set explicitly, either via the API at upload time or by editing the asset's metadata afterward.
 
 ### Recommended Test Content (To Be Selected)
 
@@ -259,7 +273,7 @@ Not yet started. Per `ARCHITECTURE.md` and `PRODUCT.md`, Widevine L3 test creden
 | # | Question | Status |
 |---|---|---|
 | 1 | Red Bull TV stream URL playback verification (see above) | **Open — blocking Phase 1 live-source implementation.** Tracked in `data-model.md` Open Schema Question #4; this document mirrors that status and should be updated in lockstep |
-| 2 | Which specific Mux test assets to upload, and what naming/title convention to use for them | Open — deferred until Mux account setup and first upload |
+| 2 | Which specific Mux test assets to upload | Open — deferred until Mux account setup and first upload. **Naming/title convention resolved** — see "VOD Source — Mux → Naming Convention" above (`passthrough` metadata). Implementation tracked in `catalog_tasks.md` TSK-CAT-35/TSK-CAT-36 |
 | 3 | Mux free tier quota sufficiency (carried over from `PRODUCT.md`) | Open — unconfirmed until real usage against the free tier is observed |
 | 4 | Thumbnail source for the Red Bull TV catalog entry (Mux has a thumbnail API; Red Bull TV does not) | Open — likely resolved with a bundled static image asset rather than a remote fetch |
 | 5 | Shaka vs Axinom for Phase 5 DRM test license server | Deferred to Phase 5 kickoff, per `ARCHITECTURE.md` |
@@ -274,3 +288,4 @@ Not yet started. Per `ARCHITECTURE.md` and `PRODUCT.md`, Widevine L3 test creden
 |---|---|---|---|
 | 0.1.0 | 2026-06-20 | Danielle Mariani | Initial draft. Documents Mux as the generic VOD source (no assets selected yet) and Red Bull TV as the live source, replacing the discontinued NASA TV. Carries forward the unverified status of the Red Bull TV stream URL from `data-model.md` v0.1.3 |
 | 0.1.1 | 2026-06-26 | Danielle Mariani | Added Live Source 2 (DW English) and Live Source 3 (NHK World-Japan) as proposed candidates to fill `navigation.md`'s 3-item Live carousel, per Open Question #7 in `CONTEXT.md`. Both flagged unverified with less verification depth than the original Red Bull TV research (no HTTP/manifest check was possible in this pass). Pending Dani's confirmation before treated as final. |
+| 0.1.2 | 2026-07-10 | Danielle Mariani | Resolved the naming-convention half of Open Question #2: `title`/`description` are now sourced from the Mux asset's `passthrough` field (JSON, set at upload time), falling back to the asset `id`/`null` only when `passthrough` is missing or malformed. Updated the "Expected Mapping to `Video` Entity" table and added a "Naming Convention" subsection. Test-asset selection itself remains open. Implementation tracked in `catalog_tasks.md` TSK-CAT-35/TSK-CAT-36 — note `specs/features/catalog/requirements.md` RQ-CAT-18/RQ-CAT-19 still describe the old id-fallback-by-default behavior and need a matching update (not yet done) |

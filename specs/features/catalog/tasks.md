@@ -1,11 +1,11 @@
 # Catalog — Tasks
 
-**Version:** 0.1.5
+**Version:** 0.1.6
 **Status:** Draft
 **Phase:** 1 (Android)
 **Owner:** Danielle Mariani
 **Created at:** 2026-07-04
-**Last Updated:** 2026-07-07
+**Last Updated:** 2026-07-10
 
 ---
 
@@ -71,6 +71,8 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | TSK-CAT-32 | Unit tests — CatalogViewModel | Testing | M | Not Started |
 | TSK-CAT-33 | Unit tests — SyncVodCatalogUseCase and SeedLiveEntriesUseCase | Testing | S | Not Started |
 | TSK-CAT-34 | Room integration tests — VideoDao and VideoRepositoryImpl | Testing | M | Not Started |
+| TSK-CAT-35 | Update MuxAssetDto — add `passthrough` field | Follow-up: Mux Title/Description | S | Not Started |
+| TSK-CAT-36 | Parse title/description from Mux `passthrough` in syncVodCatalog() | Follow-up: Mux Title/Description | S | Not Started |
 
 ---
 
@@ -823,6 +825,51 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 
 ---
 
+## Group 11 — Follow-up: Mux Title/Description Passthrough
+
+> These two tasks exist because TSK-CAT-08 and TSK-CAT-13 were already `Done` when the `title`/`description` naming convention was resolved (`content-catalog.md` Open Question #2 — see "VOD Source — Mux → Naming Convention"). Per project convention, completed tasks are not rewritten in place; the pending code changes are tracked here instead. TSK-CAT-08 and TSK-CAT-13 remain `Done` as an accurate record of what was originally implemented.
+
+---
+
+**TSK-CAT-35 — Update MuxAssetDto — add `passthrough` field**
+- Effort: S
+- Phase: 1
+- Group: Follow-up: Mux Title/Description
+- Requirements: RQ-CAT-18, RQ-CAT-19
+- Acceptance Criteria: —
+- Status: Not Started
+- Depends on: TSK-CAT-08
+- Modifies:
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/remote/MuxAssetDto.kt`
+- Details:
+  Follow-up to TSK-CAT-08 (`Done`). Add a `passthrough: String?` field to `MuxAssetDto`. No other DTO fields change — `MuxListAssetsResponse` and `MuxPlaybackIdDto` are unaffected.
+
+  This is additive and backward-compatible: assets with no `passthrough` value (or none set at upload) continue to deserialize fine, with the field simply `null`.
+
+---
+
+**TSK-CAT-36 — Parse title/description from Mux `passthrough` in syncVodCatalog()**
+- Effort: S
+- Phase: 1
+- Group: Follow-up: Mux Title/Description
+- Requirements: RQ-CAT-18, RQ-CAT-19
+- Acceptance Criteria: —
+- Status: Not Started
+- Depends on: TSK-CAT-35
+- Modifies:
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/repository/VideoRepositoryImpl.kt`
+- Details:
+  Follow-up to TSK-CAT-13 (`Done`). **Supersedes that task's prior mapping behavior** — `title`/`description` no longer fall back to `dto.id`/`null` by default.
+
+  In the `MuxAssetDto → VideoEntity` mapping step, parse `dto.passthrough` as JSON matching `{"title": "string", "description": "string?"}` (kotlinx.serialization; define a small `@Serializable data class MuxPassthroughMetadata(val title: String, val description: String? = null)`).
+
+  - If `passthrough` is non-null and parses successfully: `title = parsed.title`, `description = parsed.description`.
+  - If `passthrough` is null, blank, or fails to parse (malformed JSON, missing `title` key): fall back to `title = dto.id`, `description = null` — same safety net as before, now the exception path rather than the default. Log a `Log.w` on fallback, consistent with BR-CAT-04's existing pattern of warning-logging skipped/malformed Mux data rather than failing the whole sync.
+
+  Note: `specs/features/catalog/requirements.md` RQ-CAT-18/RQ-CAT-19 still describe the old default-fallback behavior as of this writing and need a matching update — this task's Details section is the authoritative description of the new behavior until that happens.
+
+---
+
 ## Changelog
 
 | Version | Date | Author | Notes |
@@ -833,3 +880,4 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | 0.1.3 | 2026-07-06 | Danielle Mariani | Corrections found during TSK-CAT-01/05/06 implementation: (1) TSK-CAT-01 — `Compile SDK: 35` → `37`, required by current stable `core-ktx`/`activity-compose`/`lifecycle-*`; (2) TSK-CAT-05 — removed "destructive migration acceptable," which contradicted `data-model.md`'s "not permitted in any phase"; added `exportSchema = true` and `room.schemaLocation` config pointed at `android/schemas/`, per `data-model.md`; (3) TSK-CAT-06 — `observeVodItems()` no longer specifies a `status = 'ready'` DAO filter, since `VideoEntity` has no `status` column and BR-CAT-04 filtering happens upstream at the repository layer, before upsert; (4) TSK-CAT-34 — removed the corresponding stale test case referencing a DAO-level `status` filter |
 | 0.1.4 | 2026-07-07 | Danielle Mariani | TSK-CAT-07 — fixed dangling cross-reference to a nonexistent `requirements.md` DS-CAT-05 ID (no `DS-*` ID scheme exists in `requirements.md`/`SPEC.md`); pointed instead to the "Mux API credentials" row in `requirements.md`'s Dependencies table, which is the actual source of the credential-handling rule |
 | 0.1.5 | 2026-07-07 | Danielle Mariani | Revised Live seeding design found during TSK-CAT-12/16 implementation: `LiveSeedConfig` no longer hardcodes `id`/`createdAt`/`updatedAt` as compile-time constants — `VideoRepositoryImpl.seedLiveEntries()` now generates a random UUID and real timestamp exactly once, on genuine first launch (detected via `VideoDao.getLiveIds()` being empty). Updated both tasks' Details text to match; flagged that RQ-CAT-20/`data-model.md`'s "assigned at implementation time" wording is now stale (not yet reworded) |
+| 0.1.6 | 2026-07-10 | Danielle Mariani | Added Group 11 (TSK-CAT-35, TSK-CAT-36) to implement the resolved Mux `passthrough` title/description convention (`content-catalog.md` Open Question #2). TSK-CAT-08 and TSK-CAT-13 — both `Done` — are impacted by this change but left unmodified per project convention; the two new tasks track the pending follow-up code changes against their respective files instead |

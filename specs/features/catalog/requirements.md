@@ -1,11 +1,11 @@
 # Catalog — Requirements
 
-**Version:** 0.2.1
+**Version:** 0.2.2
 **Status:** Draft
 **Phase:** 1 (Android)
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-28
-**Last Updated:** 2026-07-07
+**Last Updated:** 2026-07-10
 
 ---
 
@@ -35,7 +35,7 @@ The screen renders from a local Room cache immediately on launch, then refreshes
 - Search, filtering, sorting, or personalization (per SPEC.md "Out of Scope")
 - Detail metadata beyond the `Video` entity fields defined in `data-model.md`
 - Manual playback verification of the 3 live stream URLs — tracked separately (`data-model.md` Open Schema Questions #4–5)
-- Mux test asset selection and the `title`/`description` naming convention — tracked separately (`content-catalog.md` Open Questions #2, #4, #7)
+- Mux test asset selection — tracked separately (`content-catalog.md` Open Question #2). The `title`/`description` naming convention itself is now specified below (RQ-CAT-18, RQ-CAT-19), resolved via Mux `passthrough` metadata
 - Settings screen behavior — covered in `specs/features/settings/requirements.md`
 
 ---
@@ -112,10 +112,10 @@ A failed background refresh never clears or replaces an already-rendered cache. 
 On each catalog refresh, the VOD grid's source data is populated by calling `GET /video/v1/assets`, paginating via the response's `next_cursor` until exhausted.
 
 **RQ-CAT-18 — Field mapping**
-Mux asset fields map to the `Video` entity as: `id` ← Mux `id`; `thumbnailUrl` ← `https://image.mux.com/{playback_id}/thumbnail.jpg`; `streamUrl` ← `https://stream.mux.com/{playback_id}.m3u8`; `durationSeconds` ← Mux `duration`, rounded to the nearest second.
+Mux asset fields map to the `Video` entity as: `id` ← Mux `id`; `thumbnailUrl` ← `https://image.mux.com/{playback_id}/thumbnail.jpg`; `streamUrl` ← `https://stream.mux.com/{playback_id}.m3u8`; `durationSeconds` ← Mux `duration`, rounded to the nearest second; `title`/`description` ← parsed from Mux `passthrough` JSON metadata (see RQ-CAT-19).
 
-**RQ-CAT-19 — Title/description fallback**
-Mux assets have no native `title` or `description` field. Until `content-catalog.md` Open Question #2 (naming convention) is resolved, `Video.title` falls back to the Mux asset `id` so the grid never renders a blank label.
+**RQ-CAT-19 — Title/description mapping and fallback**
+`title`/`description` are parsed from the Mux asset's `passthrough` field — a JSON string set at upload time in the shape `{"title": "string", "description": "string?"}`. If `passthrough` is missing, blank, or fails to parse (malformed JSON or a missing `title` key), `Video.title` falls back to the Mux asset `id` and `Video.description` falls back to `null`, so the grid never renders a blank label. See `content-catalog.md`'s "VOD Source — Mux → Naming Convention" section for the full convention detail.
 
 **RQ-CAT-20 — Static live seeding**
 The 3 Live entries are seeded directly into the `videos` Room table on first app launch (or on a seed-version bump), independent of any Mux call. Each entry is assigned a stable UUID as its `Video.id`:
@@ -243,3 +243,4 @@ Full Fire TV spec is defined in `specs/features/fire-tv/requirements.md` at Phas
 | 0.1.0 | 2026-06-28 | Danielle Mariani | Initial draft. Mux `List Assets` confirmed as the real Phase 1 VOD source. Surfaced two items not previously captured elsewhere: the `status == "ready"` filter (BR-CAT-04) and the Mux secret-in-client dependency |
 | 0.2.0 | 2026-06-28 | Danielle Mariani | Added top app bar requirements (RQ-CAT-01–03, AC-CAT-09). Simplified VOD empty state to neutral message (RQ-CAT-13). Updated static live seeding to use UUIDs as `Video.id` (RQ-CAT-20). Clarified BR-CAT-04 promotion to `data-model.md`. Removed template note on ID abbreviation length |
 | 0.2.1 | 2026-07-07 | Danielle Mariani | Corrected RQ-CAT-20's UUID table and the "Static live config source" Dependencies row — both said UUIDs are "assigned at implementation" (hardcoded by the developer at coding time). Revised during TSK-CAT-12/16 implementation: the UUIDs are now generated with a real random-UUID call exactly once, on the device's genuine first app launch (detected via `VideoDao.getLiveIds()` being empty), rather than hardcoded as source constants. Reworded both to "assigned at runtime, on first app launch" |
+| 0.2.2 | 2026-07-10 | Danielle Mariani | Resolved RQ-CAT-19: `title`/`description` are now sourced from the Mux asset's `passthrough` JSON metadata (set at upload time), falling back to the asset `id`/`null` only when `passthrough` is missing or malformed — previously the id-fallback was the unconditional default. Updated RQ-CAT-18's field-mapping list to include the new `passthrough` source. Narrowed the Out of Scope line to reflect that the naming convention is now specified here, not just tracked externally; test-asset *selection* remains out of scope (`content-catalog.md` Open Question #2). Implementation tracked in `catalog_tasks.md` TSK-CAT-35/TSK-CAT-36, since TSK-CAT-08/TSK-CAT-13 were already `Done` when this was resolved |

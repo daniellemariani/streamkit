@@ -1,10 +1,10 @@
 # data-model.md — StreamKit
 
-**Version:** 0.1.6
+**Version:** 0.1.7
 **Status:** Draft
 **Owner:** Danielle Mariani
 **Created at:** 2026-06-16
-**Last Updated:** 2026-07-07
+**Last Updated:** 2026-07-10
 **Location:** specs/technical/data-model.md
 
 ---
@@ -75,6 +75,7 @@ data class VideoEntity(
 **Notes:**
 - `id` for Mux VOD assets is the Mux asset ID (e.g. `"abc123xyz"`). The three live streams use stable UUIDs generated once at runtime — on the device's genuine first app launch, detected via `VideoDao.getLiveIds()` returning empty — and must never change across app updates thereafter — see `specs/features/catalog/requirements.md` RQ-CAT-20. Human-readable names (Red Bull TV, DW English, NHK World-Japan) are stored in `title`, not in `id`.
 - **Mux asset filtering (BR-CAT-04):** only Mux assets with `status == "ready"` are mapped into `VideoEntity` rows and written to the cache. Assets in `preparing`, `errored`, or any other status are excluded at the repository layer and must never appear in the catalog.
+- **Mux title/description mapping:** Mux has no native `title`/`description` field on an asset. For Mux-sourced VOD, `title`/`description` are parsed from the asset's `passthrough` metadata (JSON, set at upload time: `{"title": "...", "description": "..."}`) — not derived from the Mux asset ID, filename, or dashboard-only metadata. If `passthrough` is missing or fails to parse, `title` falls back to the Mux asset `id` and `description` falls back to `null`. This applies to any future feature that consumes Mux assets, not just Catalog — see `specs/features/catalog/requirements.md` RQ-CAT-18/RQ-CAT-19 and `content-catalog.md`'s "VOD Source — Mux → Naming Convention" section for full detail.
 - `streamUrl` is the Mux playback URL (VOD) or one of three live candidate URLs (live). The Red Bull TV candidate (`"https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master.m3u8"`) is the most thoroughly checked of the three so far: it resolves with the correct `application/x-mpegURL` content type and the channel ID is referenced consistently across multiple third-party HLS aggregators, but manual playback testing did not produce video — the Akamai edge for this host has been observed returning `X-GeoBlock: true`, so geo-restriction is the suspected cause, but this is unconfirmed. The `dw_english` and `nhk_world` candidate URLs have had less verification depth (no HTTP/manifest check, only aggregator-list consistency). **None of the three should be treated as production-ready** — verify actual playback (e.g. via VLC or ExoPlayer directly, from the target network) before wiring any of them into Phase 1 implementation. See Open Schema Questions below and `content-catalog.md` for full detail on each.
 - `isDrmProtected` is always `false` through Phase 4. Set to `true` for Widevine-protected assets introduced in Phase 5.
 - The catalog is refreshed from the Mux API on each app launch. The Room cache is the read source for the catalog screen.
@@ -526,3 +527,4 @@ Full migration files live in `backend/migrations/` (Alembic). Each phase introdu
 | 0.1.4 | 2026-06-26 | Danielle Mariani | Generalized `Video.id` and related notes from a single static live key to three (`redbull_tv`, `dw_english`, `nhk_world`), per `navigation.md`'s 3-item Live carousel; added Open Schema Question #5 for the two new candidates' (unverified) playback status; no schema change required — `videos` already supported multiple `STATIC`/`LIVE` rows |
 | 0.1.5 | 2026-06-28 | Danielle Mariani | Updated static Live entry `id` from human-readable slugs (`redbull_tv` etc.) to stable UUIDs assigned at implementation time, per `specs/features/catalog/requirements.md` RQ-CAT-20; names remain in `title` field only. Added BR-CAT-04 as a Mux-mapping note: only assets with `status == "ready"` are mapped into `VideoEntity` and written to cache |
 | 0.1.6 | 2026-07-07 | Danielle Mariani | Corrected the `Video` entity note that said static Live UUIDs are "assigned at implementation time" — revised during TSK-CAT-12/16 implementation: they're now generated with a real random-UUID call exactly once, on the device's genuine first app launch (detected via `VideoDao.getLiveIds()` being empty), not hardcoded as source constants. Reworded to match `requirements.md` RQ-CAT-20 v0.2.1 |
+| 0.1.7 | 2026-07-10 | Danielle Mariani | Added a general Mux title/description mapping note to the `Video` entity, following the BR-CAT-04 precedent: `title`/`description` are parsed from the Mux asset's `passthrough` JSON metadata, falling back to `id`/`null` only when missing or malformed. Resolves the naming-convention half of `content-catalog.md` Open Question #2. (This change was previously applied to a stale local copy that wasn't uploaded to Project files; reapplied here to the actual current version.) |
