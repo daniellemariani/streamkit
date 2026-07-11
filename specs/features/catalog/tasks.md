@@ -1,6 +1,6 @@
 # Catalog — Tasks
 
-**Version:** 0.1.7
+**Version:** 0.1.8
 **Status:** Draft
 **Phase:** 1 (Android)
 **Owner:** Danielle Mariani
@@ -71,8 +71,9 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | TSK-CAT-32 | Unit tests — CatalogViewModel | Testing | M | Not Started |
 | TSK-CAT-33 | Unit tests — SyncVodCatalogUseCase and SeedLiveEntriesUseCase | Testing | S | Not Started |
 | TSK-CAT-34 | Room integration tests — VideoDao and VideoRepositoryImpl | Testing | M | Not Started |
-| TSK-CAT-35 | Update MuxAssetDto — add `passthrough` field | Follow-up: Mux Title/Description | S | Not Started |
-| TSK-CAT-36 | Parse title/description from Mux `passthrough` in syncVodCatalog() | Follow-up: Mux Title/Description | S | Not Started |
+| TSK-CAT-35 | Update MuxAssetDto — add `passthrough` field | Follow-up: Post-Done Corrections | S | Not Started |
+| TSK-CAT-36 | Parse title/description from Mux `passthrough` in syncVodCatalog() | Follow-up: Post-Done Corrections | S | Not Started |
+| TSK-CAT-37 | Add warning log for Mux assets excluded for missing public playback ID | Follow-up: Post-Done Corrections | XS | Not Started |
 
 ---
 
@@ -825,16 +826,16 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 
 ---
 
-## Group 11 — Follow-up: Mux Title/Description Passthrough
+## Group 11 — Follow-up: Post-Done Corrections
 
-> These two tasks exist because TSK-CAT-08 and TSK-CAT-13 were already `Done` when the `title`/`description` naming convention was resolved (`content-catalog.md` Open Question #2 — see "VOD Source — Mux → Naming Convention"). Per project convention, completed tasks are not rewritten in place; the pending code changes are tracked here instead. TSK-CAT-08 and TSK-CAT-13 remain `Done` as an accurate record of what was originally implemented.
+> These tasks exist because their source task was already `Done` when a needed change was identified. Per project convention, completed tasks are not rewritten in place; the pending code changes are tracked here instead, against the original task's `Done` record.
 
 ---
 
 **TSK-CAT-35 — Update MuxAssetDto — add `passthrough` field**
 - Effort: S
 - Phase: 1
-- Group: Follow-up: Mux Title/Description
+- Group: Follow-up: Post-Done Corrections
 - Requirements: RQ-CAT-18, RQ-CAT-19
 - Acceptance Criteria: —
 - Status: Not Started
@@ -851,7 +852,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 **TSK-CAT-36 — Parse title/description from Mux `passthrough` in syncVodCatalog()**
 - Effort: S
 - Phase: 1
-- Group: Follow-up: Mux Title/Description
+- Group: Follow-up: Post-Done Corrections
 - Requirements: RQ-CAT-18, RQ-CAT-19
 - Acceptance Criteria: —
 - Status: Not Started
@@ -868,6 +869,21 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 
 ---
 
+**TSK-CAT-37 — Add warning log for Mux assets excluded for missing public playback ID**
+- Effort: XS
+- Phase: 1
+- Group: Follow-up: Post-Done Corrections
+- Requirements: —
+- Acceptance Criteria: —
+- Status: Not Started
+- Depends on: TSK-CAT-13
+- Modifies:
+  - `android/core/src/main/java/com/dmariani/streamkit/core/data/repository/VideoRepositoryImpl.kt`
+- Details:
+  Follow-up to TSK-CAT-13 (`Done`) and `data-model.md` v0.1.8's broadened BR-CAT-04. The playback-ID exclusion itself is already correctly implemented in `toVideoEntity()` (the `?: return null` on missing a `policy == "public"` playback ID) — only the diagnostic log is missing. Add `Log.w(...)` immediately before that early return, noting the asset `id` and that it was skipped for lacking a public-policy playback ID. No behavior change — logging only.
+
+---
+
 ## Changelog
 
 | Version | Date | Author | Notes |
@@ -880,3 +896,4 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | 0.1.5 | 2026-07-07 | Danielle Mariani | Revised Live seeding design found during TSK-CAT-12/16 implementation: `LiveSeedConfig` no longer hardcodes `id`/`createdAt`/`updatedAt` as compile-time constants — `VideoRepositoryImpl.seedLiveEntries()` now generates a random UUID and real timestamp exactly once, on genuine first launch (detected via `VideoDao.getLiveIds()` being empty). Updated both tasks' Details text to match; flagged that RQ-CAT-20/`data-model.md`'s "assigned at implementation time" wording is now stale (not yet reworded) |
 | 0.1.6 | 2026-07-10 | Danielle Mariani | Added Group 11 (TSK-CAT-35, TSK-CAT-36) to implement the resolved Mux `passthrough` title/description convention (`content-catalog.md` Open Question #2). TSK-CAT-08 and TSK-CAT-13 — both `Done` — are impacted by this change but left unmodified per project convention; the two new tasks track the pending follow-up code changes against their respective files instead |
 | 0.1.7 | 2026-07-10 | Danielle Mariani | Removed a stale sentence from TSK-CAT-36's Details ("requirements.md RQ-CAT-18/19 still describe the old default-fallback behavior... need a matching update") — `requirements.md` was updated to v0.2.2 with the passthrough behavior later the same day this task was written, and the note was never removed. Caught via a Claude Code review pass |
+| 0.1.8 | 2026-07-11 | Danielle Mariani | Added TSK-CAT-37 (Group 11) — follow-up to TSK-CAT-13 (`Done`) and `data-model.md` v0.1.8's broadened BR-CAT-04: adds the missing `Log.w` when a Mux asset is excluded for lacking a public-policy playback ID (the exclusion logic itself was already correctly implemented; only the diagnostic log was missing). Renamed Group 11 from "Follow-up: Mux Title/Description Passthrough" to "Follow-up: Post-Done Corrections" and generalized its intro note, since the group is no longer passthrough-specific |
