@@ -50,7 +50,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | TSK-CAT-11 | Implement VideoRepositoryImpl — observe queries | Data Layer | S | Done |
 | TSK-CAT-12 | Implement VideoRepositoryImpl — seedLiveEntries() | Data Layer | S | Done |
 | TSK-CAT-13 | Implement VideoRepositoryImpl — syncVodCatalog() | Data Layer | M | Done |
-| TSK-CAT-14 | Implement DatabaseModule and RepositoryModule | Data Layer | S | Not Started |
+| TSK-CAT-14 | Implement DatabaseModule and RepositoryModule | Data Layer | S | Done |
 | TSK-CAT-15 | Define catalog string resources | Constants & Resources | S | Not Started |
 | TSK-CAT-16 | Define static live entry seed config | Constants & Resources | S | Done |
 | TSK-CAT-17 | Implement MainActivity and AppNavGraph shell | Navigation Shell | M | Not Started |
@@ -374,7 +374,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: Data Layer
 - Requirements: —
 - Acceptance Criteria: —
-- Status: Not Started
+- Status: Done
 - Depends on: TSK-CAT-13
 - Creates:
   - `android/core/src/main/java/com/dmariani/streamkit/core/di/DatabaseModule.kt`
