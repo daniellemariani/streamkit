@@ -1,6 +1,6 @@
 # Catalog — Tasks
 
-**Version:** 0.1.6
+**Version:** 0.1.7
 **Status:** Draft
 **Phase:** 1 (Android)
 **Owner:** Danielle Mariani
@@ -866,8 +866,6 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
   - If `passthrough` is non-null and parses successfully: `title = parsed.title`, `description = parsed.description`.
   - If `passthrough` is null, blank, or fails to parse (malformed JSON, missing `title` key): fall back to `title = dto.id`, `description = null` — same safety net as before, now the exception path rather than the default. Log a `Log.w` on fallback, consistent with BR-CAT-04's existing pattern of warning-logging skipped/malformed Mux data rather than failing the whole sync.
 
-  Note: `specs/features/catalog/requirements.md` RQ-CAT-18/RQ-CAT-19 still describe the old default-fallback behavior as of this writing and need a matching update — this task's Details section is the authoritative description of the new behavior until that happens.
-
 ---
 
 ## Changelog
@@ -881,3 +879,4 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | 0.1.4 | 2026-07-07 | Danielle Mariani | TSK-CAT-07 — fixed dangling cross-reference to a nonexistent `requirements.md` DS-CAT-05 ID (no `DS-*` ID scheme exists in `requirements.md`/`SPEC.md`); pointed instead to the "Mux API credentials" row in `requirements.md`'s Dependencies table, which is the actual source of the credential-handling rule |
 | 0.1.5 | 2026-07-07 | Danielle Mariani | Revised Live seeding design found during TSK-CAT-12/16 implementation: `LiveSeedConfig` no longer hardcodes `id`/`createdAt`/`updatedAt` as compile-time constants — `VideoRepositoryImpl.seedLiveEntries()` now generates a random UUID and real timestamp exactly once, on genuine first launch (detected via `VideoDao.getLiveIds()` being empty). Updated both tasks' Details text to match; flagged that RQ-CAT-20/`data-model.md`'s "assigned at implementation time" wording is now stale (not yet reworded) |
 | 0.1.6 | 2026-07-10 | Danielle Mariani | Added Group 11 (TSK-CAT-35, TSK-CAT-36) to implement the resolved Mux `passthrough` title/description convention (`content-catalog.md` Open Question #2). TSK-CAT-08 and TSK-CAT-13 — both `Done` — are impacted by this change but left unmodified per project convention; the two new tasks track the pending follow-up code changes against their respective files instead |
+| 0.1.7 | 2026-07-10 | Danielle Mariani | Removed a stale sentence from TSK-CAT-36's Details ("requirements.md RQ-CAT-18/19 still describe the old default-fallback behavior... need a matching update") — `requirements.md` was updated to v0.2.2 with the passthrough behavior later the same day this task was written, and the note was never removed. Caught via a Claude Code review pass |
