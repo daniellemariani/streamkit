@@ -55,7 +55,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | TSK-CAT-16 | Define static live entry seed config | Constants & Resources | S | Done |
 | TSK-CAT-17 | Implement MainActivity and AppNavGraph shell | Navigation Shell | M | Done |
 | TSK-CAT-18 | Implement SeedLiveEntriesUseCase | Use Cases | S | Done |
-| TSK-CAT-19 | Implement SyncVodCatalogUseCase | Use Cases | S | Not Started |
+| TSK-CAT-19 | Implement SyncVodCatalogUseCase | Use Cases | S | Done |
 | TSK-CAT-20 | Define CatalogUiState, VodState, CatalogEvent, CatalogUiEffect | ViewModel | S | Not Started |
 | TSK-CAT-21 | Implement CatalogViewModel — init and Flow subscriptions | ViewModel | M | Not Started |
 | TSK-CAT-22 | Implement CatalogViewModel — event handlers | ViewModel | S | Not Started |
@@ -474,7 +474,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: Use Cases
 - Requirements: RQ-CAT-14, RQ-CAT-17, RQ-CAT-18, RQ-CAT-21
 - Acceptance Criteria: AC-CAT-01, AC-CAT-02, AC-CAT-03
-- Status: Not Started
+- Status: Done
 - Depends on: TSK-CAT-10
 - Creates:
   - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/domain/SyncVodCatalogUseCase.kt`
