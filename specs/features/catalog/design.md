@@ -1,11 +1,11 @@
 # Catalog — Design
 
-**Version:** 0.1.1
+**Version:** 0.1.2
 **Status:** Draft
 **Phase:** 1 (Android)
 **Owner:** Danielle Mariani
 **Created at:** 2026-07-03
-**Last Updated:** 2026-07-04
+**Last Updated:** 2026-07-10
 
 ---
 
@@ -491,7 +491,14 @@ private suspend fun syncVodCatalog() {
     }
     result.onSuccess {
         _uiState.update { it.copy(showRefreshErrorBanner = false) }
-        // vodState updates automatically via Room Flow observation
+        // vodState normally updates via the Room Flow subscription (step 3 in init{}) —
+        // but Room's invalidation tracker only fires on rows actually written. If sync
+        // succeeds with zero ready assets AND the VOD table was already empty (e.g. the
+        // very first sync ever), upsertAll/deleteStale are true no-ops and the Flow never
+        // re-emits, leaving vodState stuck at Loading. So: explicitly check here too.
+        _uiState.update { state ->
+            if (state.vodState is VodState.Loading) state.copy(vodState = VodState.Empty) else state
+        }
     }
 }
 ```
@@ -728,3 +735,4 @@ Deferred — consistent with the global testing strategy in `ARCHITECTURE.md`. U
 |---|---|---|---|
 | 0.1.0 | 2026-07-03 | Danielle Mariani | Initial draft — Catalog as a `LazyVerticalGrid`-rooted destination in `AppNavGraph`; MVI with `CatalogUiState`/`CatalogEvent`/`CatalogUiEffect`; 16:9 Live carousel cards, 2:3 VOD poster cards; documented nested-lazy constraint and stale-entry-exclusion implementation notes |
 | 0.1.1 | 2026-07-04 | Danielle Mariani | Added Live carousel auto-advance: 8s interval, resets on manual swipe (`pagerState.settledPage` key), pauses when carousel is out of view (`isVisible` key + `LazyGridState` visibility detection). Added tracking note for pending `specs/design/design.md` Motion Guidelines update |
+| 0.1.2 | 2026-07-10 | Danielle Mariani | Fixed a misleading comment in `syncVodCatalog()`'s code sample, found during TSK-CAT-22 implementation: `// vodState updates automatically via Room Flow observation` doesn't hold when sync succeeds with zero ready assets and the VOD table was already empty — Room's invalidation tracker doesn't fire on true no-op writes, so the Flow never re-emits and `vodState` would stay stuck at `Loading`. Added an explicit `if (state.vodState is VodState.Loading) → Empty` check in the success branch |
