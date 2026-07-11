@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">StreamKit</string>
+
+    <!-- Catalog strings -->
+    <string name="catalog_app_bar_title">StreamKit</string>
+    <string name="catalog_settings_icon_description">Settings</string>
+    <string name="catalog_section_live">Live</string>
+    <string name="catalog_section_vod">Videos</string>
+    <string name="catalog_vod_empty_message">No videos available.</string>
+    <string name="catalog_vod_error_message">Couldn\'t load videos. Check your connection and try again.</string>
+    <string name="catalog_vod_error_retry">Retry</string>
+    <string name="catalog_vod_refresh_error_banner">Showing saved content — refresh failed.</string>
 </resources>
