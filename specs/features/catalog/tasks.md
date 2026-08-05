@@ -58,7 +58,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | TSK-CAT-19 | Implement SyncVodCatalogUseCase | Use Cases | S | Done |
 | TSK-CAT-20 | Define CatalogUiState, VodState, CatalogEvent, CatalogUiEffect | ViewModel | S | Done |
 | TSK-CAT-21 | Implement CatalogViewModel — init and Flow subscriptions | ViewModel | M | Done |
-| TSK-CAT-22 | Implement CatalogViewModel — event handlers | ViewModel | S | Not Started |
+| TSK-CAT-22 | Implement CatalogViewModel — event handlers | ViewModel | S | Done |
 | TSK-CAT-23 | Implement LiveBadge shared component | Shared Components | S | Not Started |
 | TSK-CAT-24 | Implement CatalogTopAppBar | Screen Components | S | Not Started |
 | TSK-CAT-25 | Implement VodPosterCard | Screen Components | S | Not Started |
@@ -540,7 +540,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: ViewModel
 - Requirements: RQ-CAT-03, RQ-CAT-06, RQ-CAT-09, RQ-CAT-15, RQ-CAT-16
 - Acceptance Criteria: AC-CAT-04, AC-CAT-06, AC-CAT-08, AC-CAT-09
-- Status: Not Started
+- Status: Done
 - Depends on: TSK-CAT-21
 - Modifies:
   - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/CatalogViewModel.kt`
