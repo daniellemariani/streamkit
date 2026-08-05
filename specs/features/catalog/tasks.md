@@ -60,7 +60,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | TSK-CAT-21 | Implement CatalogViewModel — init and Flow subscriptions | ViewModel | M | Done |
 | TSK-CAT-22 | Implement CatalogViewModel — event handlers | ViewModel | S | Done |
 | TSK-CAT-23 | Implement LiveBadge shared component | Shared Components | S | Done |
-| TSK-CAT-24 | Implement CatalogTopAppBar | Screen Components | S | Not Started |
+| TSK-CAT-24 | Implement CatalogTopAppBar | Screen Components | S | Done |
 | TSK-CAT-25 | Implement VodPosterCard | Screen Components | S | Not Started |
 | TSK-CAT-26 | Implement VodSkeletonGrid | Screen Components | S | Not Started |
 | TSK-CAT-27 | Implement CatalogEmptyState and CatalogErrorState | Screen Components | S | Not Started |
@@ -594,7 +594,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: Screen Components
 - Requirements: RQ-CAT-01, RQ-CAT-02, RQ-CAT-03
 - Acceptance Criteria: AC-CAT-09
-- Status: Not Started
+- Status: Done
 - Depends on: TSK-CAT-03, TSK-CAT-15
 - Creates:
   - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/components/CatalogTopAppBar.kt`
