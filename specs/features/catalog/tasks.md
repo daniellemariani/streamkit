@@ -59,7 +59,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | TSK-CAT-20 | Define CatalogUiState, VodState, CatalogEvent, CatalogUiEffect | ViewModel | S | Done |
 | TSK-CAT-21 | Implement CatalogViewModel — init and Flow subscriptions | ViewModel | M | Done |
 | TSK-CAT-22 | Implement CatalogViewModel — event handlers | ViewModel | S | Done |
-| TSK-CAT-23 | Implement LiveBadge shared component | Shared Components | S | Not Started |
+| TSK-CAT-23 | Implement LiveBadge shared component | Shared Components | S | Done |
 | TSK-CAT-24 | Implement CatalogTopAppBar | Screen Components | S | Not Started |
 | TSK-CAT-25 | Implement VodPosterCard | Screen Components | S | Not Started |
 | TSK-CAT-26 | Implement VodSkeletonGrid | Screen Components | S | Not Started |
@@ -567,7 +567,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: Shared Components
 - Requirements: RQ-CAT-07
 - Acceptance Criteria: AC-CAT-07
-- Status: Not Started
+- Status: Done
 - Depends on: TSK-CAT-03
 - Creates:
   - `android/core/src/main/java/com/dmariani/streamkit/core/ui/components/LiveBadge.kt`
