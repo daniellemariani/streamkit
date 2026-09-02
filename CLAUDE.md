@@ -1,6 +1,6 @@
 # CLAUDE.md — StreamKit
 
-Personal Android/Fire TV streaming reference app. Single-user, no public distribution — learning project + portfolio for streaming-company roles. Package: `com.streamkit`.
+Personal Android/Fire TV streaming reference app. Single-user, no public distribution — learning project + portfolio for streaming-company roles. Package: `com.dmariani.streamkit`.
 
 ## Spec-Driven Development — read before writing code
 Specs are written before implementation and are the source of truth. Before touching code for any feature:
