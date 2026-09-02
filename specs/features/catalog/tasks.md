@@ -64,7 +64,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 | TSK-CAT-25 | Implement VodPosterCard | Screen Components | S | Done |
 | TSK-CAT-26 | Implement VodSkeletonGrid | Screen Components | S | Done |
 | TSK-CAT-27 | Implement CatalogEmptyState and CatalogErrorState | Screen Components | S | Done |
-| TSK-CAT-28 | Implement LiveCarouselCard | Screen Components | S | Not Started |
+| TSK-CAT-28 | Implement LiveCarouselCard | Screen Components | S | Done |
 | TSK-CAT-29 | Implement LiveCarousel with auto-advance | Screen Components | M | Not Started |
 | TSK-CAT-30 | Implement VodGrid (state router) | Screen Components | S | Not Started |
 | TSK-CAT-31 | Implement CatalogScreen | Screen Components | M | Not Started |
@@ -665,7 +665,7 @@ Tasks are intentionally small to keep PRs reviewable. Each task targets a single
 - Group: Screen Components
 - Requirements: RQ-CAT-04, RQ-CAT-05, RQ-CAT-06, RQ-CAT-07
 - Acceptance Criteria: AC-CAT-07, AC-CAT-08
-- Status: Not Started
+- Status: Done
 - Depends on: TSK-CAT-23, TSK-CAT-03
 - Creates:
   - `android/app/src/main/java/com/dmariani/streamkit/app/feature/catalog/ui/components/LiveCarouselCard.kt`
